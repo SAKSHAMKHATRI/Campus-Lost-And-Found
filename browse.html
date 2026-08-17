@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Browse every lost and found report on campus, with live search and filters." />
+  <title>Browse — Campus Lost &amp; Found</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231d4ed8'/><circle cx='27' cy='27' r='11' fill='none' stroke='white' stroke-width='5'/><path d='M35.5 35.5 46 46' stroke='white' stroke-width='5' stroke-linecap='round'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Load the auth helpers first so we can check the session right away. -->
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Only logged-in users may open this page — redirect BEFORE the page
+    // scripts run, so logged-out visitors never see the page content.
+    protectPage();
+  </script>
+
+  <!-- White navbar: logo, nav links, user chip + logout -->
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a class="nav-brand" href="dashboard.html">
+        <span class="brand-icon small" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <span class="brand-name">Campus <span class="brand-accent">Lost &amp; Found</span></span>
+      </a>
+
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+      </button>
+
+      <div class="nav-menu" id="navMenu">
+        <ul class="nav-links">
+          <li><a class="nav-link" href="dashboard.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard</a></li>
+          <li><a class="nav-link active" href="browse.html" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            Browse</a></li>
+          <li><a class="nav-link" href="matches.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            Match Suggestions</a></li>
+          <li><a class="nav-link" href="dashboard.html#myReports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+            My Reports</a></li>
+          <!-- only visible when the logged-in user is an admin -->
+          <li><a class="nav-link" href="admin.html" id="adminLink" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Admin</a></li>
+        </ul>
+
+        <div class="topbar-right">
+          <span class="user-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="userName">—</span>
+          </span>
+          <button class="btn btn-small btn-outline" onclick="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <section class="page-head">
+      <div class="page-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <h1>Find an item</h1>
+      <p>Search and filter every lost &amp; found report on campus.</p>
+    </section>
+
+    <section class="panel">
+
+      <!-- search bar (filters as you type) -->
+      <div class="search-wrap" role="search">
+        <span class="search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search lost and found items..."
+          aria-label="Search reports"
+        />
+      </div>
+
+      <!-- status chips: All / Lost / Found -->
+      <div class="filter-row">
+        <span class="filter-label">Status:</span>
+        <button type="button" class="chip active" data-status="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-status="lost" aria-pressed="false">Lost</button>
+        <button type="button" class="chip" data-status="found" aria-pressed="false">Found</button>
+      </div>
+
+      <!-- dropdown filters (filled from js/items.js option lists) -->
+      <div class="filter-row">
+        <span class="filter-label">Filters:</span>
+        <select id="filterCategory" class="filter-select" aria-label="Filter by category"></select>
+        <select id="filterColor" class="filter-select" aria-label="Filter by color"></select>
+        <select id="filterLocation" class="filter-select" aria-label="Filter by campus zone"></select>
+        <select id="filterDate" class="filter-select" aria-label="Filter by date">
+          <option value="any">Any date</option>
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 2 weeks</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        <button type="button" class="btn btn-small btn-outline" onclick="clearFilters()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          Clear filters
+        </button>
+      </div>
+
+      <p id="resultCount" class="result-count"></p>
+
+      <!-- the list of item cards is drawn here by js/browse.js -->
+      <div id="itemList" class="item-grid"></div>
+
+      <!-- shown when there are no matching results -->
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <h3 id="emptyTitle">No items found</h3>
+        <p id="emptyText">Try changing the search text or clearing some filters.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>© 2026 Campus Lost &amp; Found</span>
+      <span>Lost something? Found something? Let your campus help.</span>
+    </div>
+  </footer>
+
+  <script src="js/items.js"></script>
+  <script src="js/browse.js"></script>
+  <script>
+    // Show the logged-in user's name in the top bar.
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+      // Admins see the Admin panel link; normal users never do.
+      if (getUserRole(currentUser) === 'admin') {
+        document.getElementById('adminLink').style.display = 'block';
+      }
+    }
+
+    // Mobile navigation: toggle the collapsible menu.
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (navToggle && navMenu) {
+      navToggle.addEventListener('click', function () {
+        const isOpen = navMenu.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    }
+  </script>
+</body>
+</html>

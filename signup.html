@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create an account on Campus Lost &amp; Found — report and find lost items around campus." />
+  <title>Sign Up — Campus Lost &amp; Found</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231d4ed8'/><circle cx='27' cy='27' r='11' fill='none' stroke='white' stroke-width='5'/><path d='M35.5 35.5 46 46' stroke='white' stroke-width='5' stroke-linecap='round'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-page">
+
+  <!-- Simple white navbar: logo + link to login -->
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="brand-icon small" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <span class="brand-name">Campus <span class="brand-accent">Lost &amp; Found</span></span>
+      </a>
+      <a class="btn btn-small btn-outline" href="index.html">Login</a>
+    </div>
+  </nav>
+
+  <main class="auth-layout">
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h1>Create your account</h1>
+          <p>Sign up to start reporting lost &amp; found items</p>
+        </div>
+
+        <!-- error / success messages appear in this box -->
+        <div id="signupAlert" class="alert" role="alert"></div>
+
+        <form id="signupForm" onsubmit="handleSignup(event)" novalidate>
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="e.g. Rahul Sharma" autocomplete="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="email">College Email</label>
+            <input type="email" id="email" placeholder="e.g. rahul@college.edu" autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Type the password again" autocomplete="new-password" />
+          </div>
+
+          <button type="submit" class="btn">Create Account</button>
+        </form>
+
+        <p class="auth-footer">Already have an account? <a href="index.html">Login</a></p>
+
+        <p class="security-note">
+          Academic demo: passwords are stored in your browser's LocalStorage only.
+          This is <strong>not</strong> secure authentication — Phase 2 will replace it
+          with a real backend (Node.js + JWT).
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Load storage helpers first, then the auth logic -->
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
