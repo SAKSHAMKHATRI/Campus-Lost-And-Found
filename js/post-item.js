@@ -1,15 +1,11 @@
-
-
 const type = new URLSearchParams(window.location.search).get('type');
 
-// If the type is missing or invalid, go back to the dashboard.
 if (type !== 'lost' && type !== 'found') {
   window.location.href = 'dashboard.html';
 }
 
 const isLost = type === 'lost';
 
-// Adjust the heading, icon, date label and button for this type.
 document.getElementById('formIcon').innerHTML = isLost ? ICON.package : ICON.inbox;
 document.getElementById('formTitle').textContent = isLost ? 'Post a Lost Item' : 'Post a Found Item';
 document.getElementById('formSub').textContent = isLost
@@ -18,22 +14,21 @@ document.getElementById('formSub').textContent = isLost
 document.getElementById('dateLabel').textContent = isLost ? 'Date lost *' : 'Date found *';
 document.getElementById('submitBtn').textContent = isLost ? 'Post Lost Item' : 'Post Found Item';
 
-// Fill the dropdowns with the shared option lists from items.js.
 fillSelect('category', CATEGORIES, 'Select a category');
 fillSelect('color', COLORS, 'Select a color');
 fillSelect('location', LOCATIONS, 'Select a campus zone / location');
 
-// The private verification detail (feature #4) is ONLY for FOUND items.
-// A lost item report does not need it, so the field is hidden.
 document.getElementById('verificationWrap').style.display = isLost ? 'none' : 'block';
 
-/* ---------- Form submission ---------- */
+const dateInput = document.getElementById('date');
+const today = new Date().toISOString().split('T')[0];
+dateInput.max = today;
 
-// Runs when the form is submitted.
 function handlePostItem(event) {
-  event.preventDefault(); // stop the page from reloading
+  event.preventDefault();
 
-  // Read what the user typed (.trim() removes extra spaces).
+  const submitBtn = document.getElementById('submitBtn');
+
   const itemName = document.getElementById('itemName').value.trim();
   const category = document.getElementById('category').value;
   const color = document.getElementById('color').value;
@@ -41,59 +36,76 @@ function handlePostItem(event) {
   const date = document.getElementById('date').value;
   const description = document.getElementById('description').value.trim();
 
-  // Private verification detail — only found-item finders fill this in.
-  // It is stored with the item but NEVER shown on any public page.
-  // The owner must describe it to claim the item (see matches.js).
   let verificationDetail = '';
+
   if (!isLost) {
     verificationDetail = document.getElementById('verificationDetail').value.trim();
   }
 
-  // ---- Validation (every field is required) ----
   if (itemName === '') {
     return showAlert('postAlert', 'Please enter the item name.', 'error');
   }
+
+  if (itemName.length < 3) {
+    return showAlert('postAlert', 'Item name must contain at least 3 characters.', 'error');
+  }
+
   if (category === '') {
     return showAlert('postAlert', 'Please choose a category.', 'error');
   }
+
   if (color === '') {
     return showAlert('postAlert', 'Please choose a color.', 'error');
   }
+
   if (location === '') {
     return showAlert('postAlert', 'Please choose a campus zone / location.', 'error');
   }
+
   if (date === '') {
     return showAlert('postAlert', 'Please choose the date.', 'error');
   }
+
+  if (date > today) {
+    return showAlert('postAlert', 'Date cannot be in the future.', 'error');
+  }
+
   if (description === '') {
     return showAlert('postAlert', 'Please enter a description.', 'error');
   }
 
-  // The user who is posting — this page is protected, but double-check anyway.
+  if (description.length < 10) {
+    return showAlert('postAlert', 'Please provide a more detailed description.', 'error');
+  }
+
   const user = getCurrentUser();
+
   if (!user) {
     window.location.href = 'index.html';
     return;
   }
 
-  // Build the item object and save it to LocalStorage.
+  submitBtn.disabled = true;
+
   const item = {
-    id: Date.now(),            // simple unique id
-    type: type,                // 'lost' or 'found'
+    id: Date.now(),
+    type: type,
     itemName: itemName,
     category: category,
     color: color,
     location: location,
-    date: date,                // e.g. "2026-08-08"
+    date: date,
     description: description,
-    verificationDetail: verificationDetail,  // private — only used for claim verification
-    postedBy: { id: user.id, name: user.name },  // no email stored -> privacy (feature #7)
-    status: 'open',            // lifecycle: open -> match-found -> ... (feature #5)
+    verificationDetail: verificationDetail,
+    postedBy: {
+      id: user.id,
+      name: user.name
+    },
+    status: 'open',
     createdAt: Date.now()
   };
 
-  addItem(item); // storage.js helper
+  addItem(item);
 
-  // Go back to the dashboard and show a success message there.
   window.location.href = 'dashboard.html?posted=' + type;
 }

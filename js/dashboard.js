@@ -1,5 +1,3 @@
-
-
 // 1) Success message after posting an item.
 //    The post page redirects to dashboard.html?posted=lost (or found).
 const dashboardParams = new URLSearchParams(window.location.search);
