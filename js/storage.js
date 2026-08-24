@@ -1,15 +1,4 @@
-/* ============================================================
-   storage.js — LocalStorage helpers
-   ------------------------------------------------------------
-   This file contains all the small functions that read and
-   write data in the browser's LocalStorage.
-   Every other script uses these helpers, so we always work
-   with LocalStorage in the same safe way.
 
-   LocalStorage can only store TEXT, so before saving we use
-   JSON.stringify() (object -> text) and after reading we use
-   JSON.parse() (text -> object).
-   ============================================================ */
 
 // The "keys" (names) under which we store our data in LocalStorage
 const USERS_KEY = 'users';
@@ -18,7 +7,7 @@ const ITEMS_KEY = 'items';
 const CLAIMS_KEY = 'claims';
 const ACTIVITY_KEY = 'adminActivity';
 
-/* ---------- Registered users ---------- */
+
 
 // Get the list of registered users.
 // If nothing is stored yet, return an empty array (the || [] trick).
@@ -50,7 +39,6 @@ function clearCurrentUser() {
   localStorage.removeItem(CURRENT_USER_KEY);
 }
 
-/* ---------- Lost / found items ---------- */
 
 // Get all posted items (both lost and found in one list).
 // Every item has a "type" field: 'lost' or 'found'.
@@ -71,7 +59,7 @@ function addItem(item) {
   saveItems(items);
 }
 
-/* ---------- Claims (admin panel feature) ---------- */
+
 
 // A claim links one LOST item (the claimant) to one FOUND item.
 // Status: 'pending' (waiting for the admin) -> 'approved' or 'rejected'.
@@ -91,7 +79,7 @@ function addClaim(claim) {
   saveClaims(claims);
 }
 
-/* ---------- Admin activity log ---------- */
+
 
 // A simple history of the admin's actions, shown on the admin dashboard.
 function getActivityLog() {
@@ -111,12 +99,7 @@ function addActivityLog(action, details) {
   saveActivityLog(log);
 }
 
-/* ---------- Demo admin account (Phase 1 only) ---------- */
 
-// Creates the demo admin account on first run and makes sure every user
-// has the new "role" and "active" fields (legacy users get sensible defaults).
-// NOTE: this is Phase 1 / demo-only security. Phase 2 will replace this
-// with a real backend (Node.js) and JWT-based authorization.
 function ensureAdminAccount() {
   const users = getUsers();
   let changed = false;

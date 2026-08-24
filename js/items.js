@@ -1,13 +1,4 @@
-/* ============================================================
-   items.js — shared helpers for lost / found items
-   ------------------------------------------------------------
-   Everything the report form, the browse page, the dashboard
-   and the match page need in common:
-     - the fixed option lists (categories, colours, campus zones)
-     - the item card HTML (with the status lifecycle badge)
-     - the weighted match score (maximum 10) + match strength
-     - the smart claim-verification helpers
-   ============================================================ */
+
 
 // Fixed option lists — used by the post form AND the browse
 // filters, so every page always offers exactly the same choices.
@@ -18,7 +9,7 @@ const COLORS = ['Black', 'White', 'Grey', 'Blue', 'Red', 'Green', 'Yellow', 'Ora
 // matching and filtering always compare exactly the same zone names.
 const LOCATIONS = ['Main Gate', 'Library', 'Academic Block', 'Lecture Halls', 'Canteen', 'Hostel', 'Sports Complex', 'Parking', 'Labs', 'Other'];
 
-/* ---------- Shared inline SVG icons ---------- */
+
 
 // One consistent stroke style used across the whole UI (nav, cards,
 // tables, empty states). Kept in one place so every page looks the same.
@@ -88,7 +79,7 @@ function statusLabel(item) {
   return STATUS_LABELS[item.status || 'open'];
 }
 
-/* ---------- Small display helpers ---------- */
+
 
 // Turn <, >, & etc. into safe text so a description can't break the page.
 function escapeHTML(text) {
@@ -116,7 +107,7 @@ function fillSelect(selectId, options, placeholder) {
   select.innerHTML = html;
 }
 
-/* ---------- Item card (used on Browse + Dashboard) ---------- */
+
 
 // Returns the HTML for one item, with its LOST / FOUND badge and
 // its current lifecycle status badge (features #5 and #7).
@@ -142,7 +133,7 @@ function itemCardHTML(item) {
   );
 }
 
-/* ---------- Match score (maximum 10) ---------- */
+
 
 // How many days apart two dates are (always a positive number).
 function daysBetween(dateA, dateB) {
@@ -226,7 +217,6 @@ function matchStrength(score) {
   return { label: 'Weak Match', className: 'strength-weak' };
 }
 
-/* ---------- Smart claim verification (feature #4) ---------- */
 
 // Compare a claimant's answer against the finder's private detail.
 // Returns { ok, message } — "ok: true" means the claim is VERIFIED.

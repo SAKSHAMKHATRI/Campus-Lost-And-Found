@@ -1,24 +1,6 @@
-/* ============================================================
-   admin.js — the Admin Panel (Phase 1 / demo)
-   ------------------------------------------------------------
-   Runs on admin.html only. Provides:
-     - Dashboard  : summary cards + latest admin activity
-     - Users      : list, activate/deactivate, delete (not self)
-     - Reports    : search, filter, edit, delete, mark returned
-     - Claims     : approve / reject pending claims
-     - Matches    : read-only overview of all scored pairs
-     - Data       : direct LocalStorage operations
-
-   SECURITY NOTE: access is guarded by requireAdmin() in auth.js,
-   which only checks the role stored in LocalStorage. This is a
-   Phase 1 academic demo — Phase 2 will use JWT + a backend.
-   ============================================================ */
-
-// Refuse to run for anyone who is not a logged-in admin
-// (belt-and-braces — admin.html already calls requireAdmin() early).
 requireAdmin();
 
-/* ---------- Tab switching ---------- */
+
 
 const ADMIN_TABS = ['dashboard', 'users', 'reports', 'claims', 'matches', 'data'];
 

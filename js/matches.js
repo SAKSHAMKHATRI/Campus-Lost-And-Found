@@ -1,16 +1,4 @@
-/* ============================================================
-   matches.js — automatic match suggestions + claim verification
-   ------------------------------------------------------------
-   1. Compares every LOST item with every FOUND item using the
-      weighted score from items.js (maximum 10) and shows the
-      highest-scoring matches first.
-   2. Marks reports as "Match Found" the first time they match.
-   3. Lets the owner of a LOST item claim a matched FOUND item:
-      the claimant describes an identifying detail and it is
-      compared with the finder's private detail. Matching answers
-      create a PENDING CLAIM that the admin approves/rejects in
-      the admin panel (claim verification feature #4).
-   ============================================================ */
+
 
 // Draw the full list of match pairs.
 function renderMatches() {
@@ -301,7 +289,7 @@ function markMatchReturned(lostId) {
   renderMatches();
 }
 
-/* ---------- Wire up the events ---------- */
+
 
 // The dropdown lets the user focus on one lost item.
 document.getElementById('lostFilter').addEventListener('change', renderMatches);

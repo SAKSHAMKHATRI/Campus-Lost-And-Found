@@ -1,9 +1,4 @@
-/* ============================================================
-   dashboard.js — extra behaviour for the dashboard page
-   ------------------------------------------------------------
-   1. Shows a green success message right after posting an item.
-   2. Lists the 3 most recent reports from LocalStorage.
-   ============================================================ */
+
 
 // 1) Success message after posting an item.
 //    The post page redirects to dashboard.html?posted=lost (or found).

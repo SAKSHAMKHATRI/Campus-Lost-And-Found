@@ -1,18 +1,3 @@
-/* ============================================================
-   browse.js — live search + filters for the Browse page
-   ------------------------------------------------------------
-   Reads all items from LocalStorage and re-draws the list
-   whenever the search box or any filter changes.
-   No page reload is needed.
-
-   Filters available:
-     - search text (typed in the box)
-     - status (All / Lost / Found)
-     - category / colour / campus zone (dropdowns)
-     - date (Last 7 days, 2 weeks, 30 days, 90 days)
-     - "Clear filters" button resets everything
-   ============================================================ */
-
 // The current filter state ('' means "show everything").
 const browseFilters = {
   search: '',     // text from the search box

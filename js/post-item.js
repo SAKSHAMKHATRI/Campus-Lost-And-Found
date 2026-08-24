@@ -1,13 +1,5 @@
-/* ============================================================
-   post-item.js — the "Post a Lost / Found Item" form
-   ------------------------------------------------------------
-   One page handles both report types. The URL decides which
-   one we are on:
-     post-item.html?type=lost   -> Post a Lost Item
-     post-item.html?type=found  -> Post a Found Item
-   ============================================================ */
 
-// Which kind of form is this?
+
 const type = new URLSearchParams(window.location.search).get('type');
 
 // If the type is missing or invalid, go back to the dashboard.

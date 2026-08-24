@@ -1,15 +1,4 @@
-/* ============================================================
-   auth.js — Signup / Login / Logout + page protection
-   ------------------------------------------------------------
-   This file controls authentication using the helpers from
-   storage.js. Remember: passwords in LocalStorage are NOT
-   secure. This is only fine for a Phase 1 academic demo —
-   Phase 2 will use a real backend (Node.js + JWT).
-   ============================================================ */
 
-/* ---------- SIGNUP ---------- */
-
-// Runs when the Signup form is submitted.
 function handleSignup(event) {
   event.preventDefault(); // stop the page from reloading
 
