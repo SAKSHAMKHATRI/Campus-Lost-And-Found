@@ -5,7 +5,7 @@ A web-based Campus Lost & Found Matching System designed to help students report
 The project is developed progressively in phases. Phase 1 focuses on a frontend-based implementation using Vanilla JavaScript and LocalStorage, while the planned Phase 2 moves the application toward a full-stack architecture.
 
 ---
-
+Live Demo : https://campuslost-and-found.netlify.app/
 ## 📌 Project Overview
 
 Finding lost belongings on a college campus can be difficult because students may have to manually search through different reports.
