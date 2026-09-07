@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard — report lost or found items on campus and get automatic match suggestions." />
+  <title>Dashboard — Campus Lost &amp; Found</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231d4ed8'/><circle cx='27' cy='27' r='11' fill='none' stroke='white' stroke-width='5'/><path d='M35.5 35.5 46 46' stroke='white' stroke-width='5' stroke-linecap='round'/></svg>" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    protectPage();
+  </script>
+
+  <nav class="navbar" aria-label="Main navigation">
+
+    <div class="navbar-inner">
+
+      <a class="nav-brand" href="dashboard.html">
+
+        <span class="brand-icon small" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+        </span>
+
+        <span class="brand-name">
+          Campus <span class="brand-accent">Lost &amp; Found</span>
+        </span>
+
+      </a>
+
+      <button
+        type="button"
+        class="nav-toggle"
+        id="navToggle"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        aria-controls="navMenu"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 6h16"/>
+          <path d="M4 12h16"/>
+          <path d="M4 18h16"/>
+        </svg>
+      </button>
+
+      <div class="nav-menu" id="navMenu">
+
+        <ul class="nav-links">
+
+          <li>
+            <a class="nav-link active" href="dashboard.html" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+              Dashboard
+            </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="browse.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+              Browse
+            </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="matches.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+              Match Suggestions
+            </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="dashboard.html#myReports">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="2" width="8" height="4" rx="1"/>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <path d="M9 12h6"/>
+                <path d="M9 16h4"/>
+              </svg>
+              My Reports
+            </a>
+          </li>
+
+          <li>
+            <a class="nav-link" href="admin.html" id="adminLink" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Admin
+            </a>
+          </li>
+
+        </ul>
+
+        <div class="topbar-right">
+
+          <span class="user-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span id="userName">—</span>
+          </span>
+
+          <button class="btn btn-small btn-outline" onclick="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <path d="m16 17 5-5-5-5"/>
+              <path d="M21 12H9"/>
+            </svg>
+            Logout
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+  <main class="container" id="top">
+
+    <section class="hero">
+
+      <span class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Campus community hub
+      </span>
+
+      <h1>Welcome back, <span id="heroName">—</span></h1>
+
+      <p class="hero-sub">
+        Manage your lost and found reports from one place.
+      </p>
+
+    </section>
+
+    <section class="stat-row" aria-label="Quick statistics">
+
+      <div class="stat-card">
+
+        <div class="stat-icon stat-lost" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8v8a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.73l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/>
+            <path d="M3.3 7 12 12l8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
+        </div>
+
+        <div class="stat-num" id="statLostItems">0</div>
+        <div class="stat-label">Lost Items</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-icon stat-found" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+          </svg>
+        </div>
+
+        <div class="stat-num" id="statFoundItems">0</div>
+        <div class="stat-label">Found Items</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-icon stat-match" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+        </div>
+
+        <div class="stat-num" id="statActiveMatches">0</div>
+        <div class="stat-label">Active Matches</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-icon stat-returned" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+
+        <div class="stat-num" id="statReturnedItems">0</div>
+        <div class="stat-label">Returned Items</div>
+
+      </div>
+
+    </section>
+
+    <div id="dashAlert" class="alert" role="alert"></div>
+
+    <section class="section" id="quick">
+
+      <div class="section-head">
+        <h2>Quick Actions</h2>
+        <p>Everything you can do from the dashboard.</p>
+      </div>
+
+      <div class="action-grid">
+
+        <a class="action-card" href="post-item.html?type=lost">
+
+          <span class="action-icon lost" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8v8a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.73l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/>
+              <path d="M3.3 7 12 12l8.7-5"/>
+              <path d="M12 22V12"/>
+            </svg>
+          </span>
+
+          <h3>Post Lost Item</h3>
+          <p>Report an item you have lost on campus and start the search.</p>
+          <span class="card-btn">Post Lost Item</span>
+
+        </a>
+
+        <a class="action-card" href="post-item.html?type=found">
+
+          <span class="action-icon found" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+
+          <h3>Post Found Item</h3>
+          <p>Report something you found on campus so it can find its way home.</p>
+          <span class="card-btn">Post Found Item</span>
+
+        </a>
+
+        <a class="action-card" href="browse.html">
+
+          <span class="action-icon browse" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </span>
+
+          <h3>Browse Items</h3>
+          <p>Explore every lost &amp; found report with live search and filters.</p>
+          <span class="card-btn">Browse Items</span>
+
+        </a>
+
+        <a class="action-card" href="matches.html">
+
+          <span class="action-icon match" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </span>
+
+          <h3>Match Suggestions</h3>
+          <p>See automatic probable matches, scored out of 10 by our engine.</p>
+          <span class="card-btn">View Matches</span>
+
+        </a>
+
+      </div>
+
+    </section>
+
+    <section class="section panel" id="recent" aria-label="Recent reports">
+
+      <div class="section-head">
+        <h2>Recent Reports</h2>
+        <p>The latest lost &amp; found items posted on campus.</p>
+      </div>
+
+      <div id="recentList"></div>
+
+      <p style="margin-top: 18px; margin-bottom: 0;">
+
+        <a class="btn btn-small btn-outline" href="browse.html">
+          Browse all items
+
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+
+        </a>
+
+      </p>
+
+    </section>
+
+    <section class="section panel" id="myReports" aria-label="My reports">
+
+      <div class="section-head">
+        <h2>My Reports</h2>
+        <p>Your reports and where each one stands in the return process.</p>
+      </div>
+
+      <div id="myReportsBody" class="table-scroll"></div>
+
+    </section>
+
+    <section class="info-strip" role="note">
+
+      <span class="info-strip-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+      </span>
+
+      <div>
+
+        <strong>Smart match suggestions</strong>
+
+        <p>
+          When reports are posted, the app scores probable matches:
+          category <strong>+3</strong>,
+          colour <strong>+2</strong>,
+          campus zone <strong>+2</strong>,
+          dates within 3 days <strong>+2</strong>,
+          shared description keyword <strong>+1</strong>
+          (maximum 10).
+          For example <span class="score-pill">8/10 Match</span>.
+          Claims are verified with a private detail instead of sharing personal contact info.
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+
+    <div class="footer-inner">
+      <span>© 2026 Campus Lost &amp; Found</span>
+      <span>Lost something? Found something? Let your campus help.</span>
+    </div>
+
+  </footer>
+
+  <script src="js/items.js"></script>
+  <script src="js/dashboard.js"></script>
+
+  <script>
+
+    function renderQuickStats() {
+
+      const items = getItems();
+
+      const lostItems = items.filter(i => i.type === 'lost');
+      const foundItems = items.filter(i => i.type === 'found');
+      const returned = items.filter(i => i.status === 'returned');
+
+      let activeMatches = 0;
+
+      lostItems
+        .filter(i => i.status !== 'returned')
+        .forEach(function (lost) {
+
+          foundItems
+            .filter(i => i.status !== 'returned')
+            .forEach(function (found) {
+
+              if (getMatchScore(lost, found).score > 0) {
+                activeMatches++;
+              }
+
+            });
+
+        });
+
+      document.getElementById('statLostItems').textContent = lostItems.length;
+      document.getElementById('statFoundItems').textContent = foundItems.length;
+      document.getElementById('statActiveMatches').textContent = activeMatches;
+      document.getElementById('statReturnedItems').textContent = returned.length;
+
+    }
+
+    renderQuickStats();
+
+  </script>
+
+  <script>
+
+    const currentUser = getCurrentUser();
+
+    if (currentUser) {
+
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('heroName').textContent = currentUser.name;
+
+      if (getUserRole(currentUser) === 'admin') {
+        document.getElementById('adminLink').style.display = 'block';
+      }
+
+    }
+
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+
+    if (navToggle && navMenu) {
+
+      navToggle.addEventListener('click', function () {
+
+        const isOpen = navMenu.classList.toggle('open');
+
+        navToggle.setAttribute(
+          'aria-expanded',
+          isOpen ? 'true' : 'false'
+        );
+
+      });
+
+    }
+
+  </script>
+
+</body>
+</html>
