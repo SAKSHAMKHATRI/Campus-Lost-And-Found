@@ -1,721 +1,847 @@
-# 🔎 Lost & Found Management System
+🔎 Campus Lost & Found
 
-A web-based Lost & Found Management System designed to help users report, search, and manage lost and found items in an organized way.
+A web-based Campus Lost & Found platform designed to make reporting, browsing, and matching lost and found items easier within a campus environment.
 
-The application provides a simple interface where users can create an account, log in, submit lost or found item reports, browse recent reports, and find relevant information about items reported by other users.
+The application provides a simple interface where users can create an account, log in, post lost or found item reports, browse recent reports, and view smart match suggestions between lost and found items.
 
-The main goal of this project is to make the process of reporting and finding lost belongings easier, faster, and more organized.
+The main goal of the project is to provide a centralized and organized way for students to report missing belongings and discover items that may have been found by other campus users.
 
-Live Demo : https://campuslost-and-found.netlify.app/
+Live Demo: https://campuslost-and-found.netlify.app/
 
----
+📌 Table of Contents
 
-# 📌 Table of Contents
+Project Overview
 
-* [Project Overview](#-project-overview)
-* [Problem Statement](#-problem-statement)
-* [Objectives](#-objectives)
-* [Key Features](#-key-features)
-* [Application Flow](#-application-flow)
-* [Screenshots](#-screenshots)
+Problem Statement
 
-  * [Login](#1-login-page)
-  * [Sign Up](#2-sign-up-page)
-  * [Dashboard](#3-dashboard)
-  * [Lost & Found](#4-lost--found)
-  * [Recent Reports](#5-recent-reports)
-  * [Report an Item](#6-report-an-item)
-  * [Report Details](#7-report-details)
-* [How the System Works](#-how-the-system-works)
-* [User Journey](#-user-journey)
-* [Technology Stack](#-technology-stack)
-* [Project Structure](#-project-structure)
-* [Installation & Setup](#-installation--setup)
-* [Future Enhancements](#-future-enhancements)
-* [Conclusion](#-conclusion)
+Objectives
 
----
+Key Features
 
-# 🚀 Project Overview
+Application Flow
 
-The Lost & Found Management System is developed to provide a centralized platform for managing lost and found items.
+Screenshots
 
-In real-world environments such as colleges, universities, offices, hostels, libraries, malls, and public places, people frequently lose personal belongings. Finding these belongings can be difficult because there is often no centralized system where users can report and search for lost items.
+Login Page
 
-This project solves that problem by providing a digital platform where users can:
+Sign Up Page
 
-* Create an account
-* Log in to the system
-* Report lost items
-* Report found items
-* Browse recently submitted reports
-* View information about reported items
-* Search for relevant lost or found belongings
-* Connect the information about lost and found items in one place
+Dashboard
 
-The system focuses on providing a simple and user-friendly experience so that users can quickly submit or find an item report.
+Recent Reports
 
----
+Lost Items
 
-# ❗ Problem Statement
+Found Items
 
-When a person loses an important belonging, such as a wallet, mobile phone, ID card, bag, keys, documents, or other personal items, finding it can be difficult.
+Smart Match Suggestions
 
-Traditional lost-and-found processes usually depend on:
+How Smart Matching Works
 
-* Verbal communication
-* Notice boards
-* Social media groups
-* Manual registers
-* Informal messages
+User Journey
 
-These approaches are not always efficient because information can become difficult to track and users may not know where to look.
+Technology Stack
 
-The proposed Lost & Found Management System provides a centralized digital solution where information about lost and found items can be stored and accessed easily.
+Project Structure
 
----
+Installation & Setup
 
-# 🎯 Objectives
+Future Enhancements
+
+Conclusion
+
+🚀 Project Overview
+
+Campus Lost & Found is a web application created to help students and campus users manage lost and found belongings through a single platform.
+
+In a college environment, students may lose items such as mobile phones, wallets, ID cards, bags, keys, books, documents, or other personal belongings. At the same time, another student may find the item without knowing who owns it.
+
+Instead of depending only on verbal communication, notice boards, or scattered messages, this application provides a centralized place where users can post and browse reports.
+
+The application allows users to:
+
+Create a new account
+
+Log in to the platform
+
+Access a personal dashboard
+
+Post lost-item reports
+
+Post found-item reports
+
+Browse available lost and found reports
+
+View recent reports
+
+Receive smart match suggestions
+
+View match scores and understand why two reports may be related
+
+❗ Problem Statement
+
+Lost belongings are common in campus environments, but finding them again can be difficult.
+
+Traditional methods may involve:
+
+Asking friends or classmates
+
+Posting messages in group chats
+
+Checking physical notice boards
+
+Contacting campus offices
+
+Manually searching through lost-and-found records
+
+These methods can make it difficult to keep track of reports and identify a possible match between a lost item and a found item.
+
+The Campus Lost & Found system addresses this problem by organizing reports digitally and providing a Smart Match Suggestions feature that compares lost and found reports.
+
+🎯 Objectives
 
 The main objectives of the project are:
 
-1. To provide users with an easy platform for reporting lost items.
-2. To allow users to report items they have found.
-3. To display recent lost and found reports.
-4. To organize item information in a structured manner.
-5. To make searching for lost belongings easier.
-6. To provide a user-friendly interface.
-7. To provide authentication through Login and Sign Up.
-8. To reduce the dependency on manual lost-and-found processes.
-9. To create a centralized database of reported items.
-10. To improve the chances of reconnecting lost items with their owners.
+Provide a centralized platform for campus lost-and-found reports.
 
----
+Allow users to create accounts and log in.
 
-# ✨ Key Features
+Allow users to report both lost and found items.
 
-## 🔐 1. User Authentication
+Make recent reports easy to discover.
 
-The system provides authentication functionality through Login and Sign Up.
+Provide separate browsing for lost and found items.
 
-New users can create an account using the registration page, while existing users can log in to access the application.
+Automatically compare lost and found reports.
 
-### Benefits
+Display potential matches with a score.
 
-* User account creation
-* Secure login flow
-* Personalized user experience
-* Restricted access to user-specific functionality
+Explain the factors contributing to a match score.
 
----
+Provide a simple and user-friendly interface.
 
-# 📸 Screenshots
+Reduce the time and effort required to find lost belongings.
 
-## 1. Login Page
+✨ Key Features
+
+🔐 1. User Authentication
+
+The application provides Login and Sign Up functionality.
+
+New users can create an account, while existing users can log in and continue to their dashboard.
+
+Login
+
+The Login page provides fields for the user's email and password and gives access to the main dashboard.
+
+Sign Up
+
+The Sign Up page allows a new campus user to create an account before using the reporting features.
+
+🏠 2. Dashboard
+
+After logging in, the user can access the main dashboard.
+
+The dashboard acts as the central navigation point for the application and provides access to features such as:
+
+Browsing reports
+
+Posting lost items
+
+Posting found items
+
+Viewing recent reports
+
+Checking smart match suggestions
+
+Viewing the user's own reports
+
+🕒 3. Recent Reports
+
+The Recent Reports section helps users quickly see the latest lost and found activity.
+
+This can be useful when a user has recently lost something and wants to check whether another person has already reported finding it.
+
+🔎 4. Lost & Found Browsing
+
+Users can browse reported lost and found items and review information associated with each report.
+
+The browsing experience helps users narrow their search and identify reports that may relate to their missing belongings.
+
+🤖 5. Smart Match Suggestions
+
+One of the key features of the application is Smart Match Suggestions.
+
+The application compares lost-item reports with found-item reports and calculates a match score.
+
+According to the application's match explanation, the score can consider factors such as:
+
+Same category: +3
+
+Same campus zone: +2
+
+Dates within 3 days: +2
+
+Shared description keyword: +1
+
+The system then uses the resulting score to classify match strength:
+
+8–10: Strong
+
+5–7: Possible
+
+1–4: Weak
+
+This allows users to focus first on the most promising matches instead of manually comparing every report.
+
+📸 Screenshots
+
+The screenshots below demonstrate the major user-facing parts of the application.
+
+1. Login Page
 
 The Login Page is the entry point for existing users.
 
-Users can enter their registered credentials and access the Lost & Found application.
+Users enter their registered email address and password to continue to their dashboard.
 
-![Login Page](./screenshots/login.png)
 
-### What this page provides
 
-* User login
-* Input fields for credentials
-* Authentication access
-* Navigation towards account creation
+Main elements
 
-The login interface is designed to keep the authentication process simple and easy to understand.
+Campus Lost & Found branding
 
----
+Email input
 
-## 2. Sign Up Page
+Password input
 
-The Sign Up Page allows new users to create an account before using the application.
+Login button
 
-![Sign Up Page](./screenshots/signup.png)
+Create an account option
 
-### What this page provides
+The page keeps the authentication process simple and provides a clear path for both existing and new users.
 
-* New user registration
-* Required user information
-* Account creation
-* Navigation back to Login
+2. Sign Up Page
 
-After successfully creating an account, the user can use the Login Page to access the application.
+The Sign Up Page allows new users to create an account.
 
----
 
-# 🏠 3. Dashboard
 
-After authentication, the user is taken to the main application/dashboard.
+After registration, users can log in and access the main application.
 
-![Dashboard](./screenshots/dashboard.png)
+Main purpose
 
-The dashboard acts as the central point of the application.
+Create a new user account
 
-From here, users can access important functionality such as:
+Collect required registration information
 
-* Lost item reports
-* Found item reports
-* Recent reports
-* Reporting a new item
-* Viewing item information
+Provide navigation back to Login
 
-The dashboard is designed to provide quick access to the major features of the system.
+3. Dashboard
 
----
+The Dashboard is the main area available after authentication.
 
-# 🔎 4. Lost & Found Page
 
-The Lost & Found section contains reports related to lost and found belongings.
 
-![Lost & Found Page](./screenshots/lost-found.png)
+It provides users with a central place to access the application's major features.
 
-Users can use this section to browse available reports and identify items that may be relevant to them.
+Users can navigate towards:
 
-Each report can contain important information such as:
+Dashboard
 
-* Item name
-* Item category
-* Description
-* Location
-* Date
-* Status
-* Additional information
-* Image of the item, where available
+Browse
 
-This makes it easier for users to compare their lost belongings with the reports available in the system.
+Match Suggestions
 
----
+My Reports
 
-# 🕒 5. Recent Reports
+Lost-item posting
 
-The Recent Reports section displays newly submitted reports.
+Found-item posting
 
-![Recent Reports](./screenshots/recent-reports.png)
+4. Recent Reports
 
-This feature allows users to quickly see what has recently been reported.
+The Recent Reports page displays recently submitted lost and found reports.
 
-For example, if a user recently lost a wallet or phone, they can check recent reports to see whether someone has submitted a corresponding found-item report.
 
-### Advantages
 
-* Quick access to new reports
-* Easier discovery of recently found items
-* Keeps users updated
-* Reduces the time required to search through old reports
+This feature is useful for users who want to quickly check the latest activity on campus.
 
----
+For example, if a student recently lost a wallet, they can check recent reports to see whether a corresponding found report has been posted.
 
-# 📝 6. Report an Item
+5. Lost Items
 
-The reporting functionality allows users to submit information about a lost or found belonging.
+The Lost Items section contains reports submitted by users who have lost belongings.
 
-![Report Item](./screenshots/report-item.png)
 
-A user can provide relevant information about the item so that other users can identify it.
 
-Depending on the implementation, the report may include:
+A lost-item report can provide information that helps other users identify the missing belonging.
 
-* Item name
-* Category
-* Description
-* Location
-* Date
-* Item status
-* Image
-* Additional details
+Typical information can include:
 
-After submission, the report becomes available in the system.
+Item name
 
----
+Category
 
-# 📄 7. Report Details
+Description
 
-Users can open an individual report to view more detailed information.
+Location
 
-![Report Details](./screenshots/report-details.png)
+Date
 
-The details page provides a complete view of the selected report.
+Image, where provided
 
-It can help users determine whether the reported item matches the belongings they have lost or found.
+Additional details
 
----
+6. Found Items
 
-# 🔄 Application Flow
+The Found Items section contains reports submitted by users who have found belongings.
 
-The overall application flow can be represented as:
 
-```text
-                 ┌───────────────┐
-                 │   Start App   │
-                 └───────┬───────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │  Login / Sign Up│
-                └────────┬────────┘
-                         │
-                         ▼
-                  ┌─────────────┐
-                  │  Dashboard  │
-                  └──────┬──────┘
-                         │
-          ┌──────────────┼──────────────┐
-          │              │              │
-          ▼              ▼              ▼
-    ┌───────────┐  ┌────────────┐  ┌──────────────┐
-    │Lost Items │  │Found Items │  │Recent Reports│
-    └─────┬─────┘  └──────┬─────┘  └──────┬───────┘
-          │               │               │
-          └───────────────┼───────────────┘
-                          │
-                          ▼
-                   ┌──────────────┐
-                   │Report Details│
-                   └──────────────┘
-```
 
----
+A found-item report gives other users an opportunity to identify whether the reported item could be the one they lost.
 
-# 👤 User Journey
+The information provided in these reports can also be used by the Smart Match Suggestions feature.
 
-A typical user interaction with the application works as follows:
+7. Smart Match Suggestions
+
+The Smart Match Suggestions page compares lost-item and found-item reports to identify potentially related items.
 
-### Step 1 — Create an Account
 
-A new user opens the application and creates an account through the Sign Up page.
 
-### Step 2 — Login
+The page explains that every lost item is compared with every found item and that matches are scored out of 10.
 
-After registration, the user logs into the system using their credentials.
+The interface also provides a "How the score works" explanation so users can understand how the matching score is calculated.
 
-### Step 3 — Access Dashboard
+The page groups possible matches into:
 
-After successful authentication, the dashboard becomes available.
+Strong: 8–10
 
-### Step 4 — Browse Reports
+Possible: 5–7
 
-The user can browse lost and found reports available in the system.
+Weak: 1–4
 
-### Step 5 — Check Recent Reports
+If there are not enough reports to create a match, the page clearly informs the user that at least one lost item and one found item are required.
 
-The user can check recently submitted reports to quickly identify new information.
+This makes the matching process transparent instead of showing a score without explaining where it came from.
 
-### Step 6 — Submit a Report
+🔄 Application Flow
 
-If the user has lost or found an item, they can create a new report.
+The overall user flow of the application is:
 
-### Step 7 — View Details
+                    ┌─────────────────┐
+                    │    Start App    │
+                    └────────┬────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │    Login / Sign Up  │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │     Dashboard   │
+                    └────────┬────────┘
+                             │
+             ┌───────────────┼────────────────┐
+             │               │                │
+             ▼               ▼                ▼
+       ┌───────────┐   ┌─────────────┐  ┌──────────────┐
+       │ Lost Items│   │ Found Items │  │Recent Reports│
+       └─────┬─────┘   └──────┬──────┘  └──────┬───────┘
+             │                │                │
+             └────────────────┼────────────────┘
+                              │
+                              ▼
+                   ┌─────────────────────┐
+                   │ Smart Match Engine  │
+                   └──────────┬──────────┘
+                              │
+                              ▼
+                   ┌─────────────────────┐
+                   │ Match Suggestions   │
+                   │ Score: 0–10         │
+                   └─────────────────────┘
 
-Users can open individual reports to view complete information about an item.
+🤖 How Smart Matching Works
 
----
+The Smart Match feature is designed to reduce the amount of manual comparison required from users.
 
-# ⚙️ How the System Works
+The basic process is:
 
-The application follows a basic client-server/data-management workflow.
+Lost Reports
+     │
+     ▼
+Compare with Found Reports
+     │
+     ├── Same Category
+     ├── Same Campus Zone
+     ├── Date Difference
+     └── Shared Description Keyword
+     │
+     ▼
+Calculate Match Score
+     │
+     ▼
+Classify Match Strength
+     │
+     ├── 8–10 → Strong
+     ├── 5–7  → Possible
+     └── 1–4  → Weak
+     │
+     ▼
+Display Best Matches First
 
-```text
-User
- │
- ▼
-Frontend Interface
- │
- ▼
-Authentication / Application Logic
- │
- ▼
-Backend
- │
- ▼
-Database
- │
- ▼
-Stored Lost & Found Reports
-```
+Example
 
-When a user performs an action, the application processes the request and updates or retrieves the relevant information.
+Suppose a user reports a lost item in a particular category and campus zone.
 
-For example:
+If a found-item report has:
 
-### Reporting a Lost Item
+The same category
 
-```text
-User
- ↓
-Opens Report Form
- ↓
-Enters Item Information
- ↓
-Submits Report
- ↓
-Backend Processes Request
- ↓
-Information Stored
- ↓
-Report Appears in Lost & Found
-```
+The same campus zone
 
-### Finding an Item
+A date within three days
 
-```text
-User
- ↓
-Opens Lost & Found
- ↓
-Browses / Searches Reports
- ↓
-Selects Relevant Report
- ↓
-Views Report Details
- ↓
-Checks Item Information
-```
+A shared keyword in the description
 
----
+the system can assign points based on those matching factors.
 
-# 🧩 Main Modules
+The total score is then used to communicate how strong the potential match is.
 
-## 1. Authentication Module
+👤 User Journey
 
-Responsible for:
+A typical user journey looks like this:
 
-* Registration
-* Login
-* User authentication
-* User session/access management
+Step 1 — Create an Account
 
----
+A new user opens the application and registers through the Sign Up page.
 
-## 2. Lost Item Module
+Step 2 — Login
 
-Responsible for:
+The user enters their registered credentials on the Login page.
 
-* Creating lost-item reports
-* Displaying lost items
-* Viewing lost-item information
+Step 3 — Open Dashboard
 
----
+After authentication, the user reaches the Dashboard.
 
-## 3. Found Item Module
+Step 4 — Report an Item
 
-Responsible for:
+If the user has lost an item, they can submit a lost-item report.
 
-* Creating found-item reports
-* Displaying found items
-* Viewing found-item information
+If they have found an item, they can submit a found-item report.
 
----
+Step 5 — Browse Reports
 
-## 4. Recent Reports Module
+The user can browse available lost and found reports.
 
-Responsible for displaying recently created reports so users can quickly access the latest information.
+Step 6 — Check Recent Reports
 
----
+The user can check recently submitted reports for newly reported belongings.
 
-## 5. Report Management Module
+Step 7 — Check Match Suggestions
 
-Responsible for storing and displaying information associated with individual reports.
+The Smart Match Suggestions section compares available lost and found reports and presents potential matches.
 
----
+Step 8 — Evaluate the Match
 
-# 🛠️ Technology Stack
+The user can review the match score and the factors contributing to it.
 
-The exact technologies used in the project are:
+This helps the user decide whether a found report may correspond to their lost item.
 
-### Frontend
+🧩 Main Modules
 
-* `[Frontend Technology]`
+1. Authentication Module
 
-### Backend
+Handles:
 
-* `[Backend Technology]`
+User registration
 
-### Database
+User login
 
-* `[Database Technology]`
+Access to the application after authentication
 
-### Authentication
+2. Lost Item Module
 
-* `[Authentication Technology]`
+Handles:
 
-### Development Tools
+Creating lost-item reports
 
-* VS Code
-* Git / GitHub
-* Browser Developer Tools
+Displaying lost reports
 
-> The technologies above can be updated according to the actual implementation of the project.
+Providing information about lost belongings
 
----
+3. Found Item Module
 
-# 📁 Project Structure
+Handles:
 
-A typical structure of the project is:
+Creating found-item reports
 
-```text
-Lost-And-Found/
+Displaying found reports
+
+Providing information about found belongings
+
+4. Recent Reports Module
+
+Displays the latest reports so users can quickly discover recent lost and found activity.
+
+5. Smart Matching Module
+
+Compares lost and found reports and calculates a score based on the matching criteria implemented by the application.
+
+The score helps prioritize potentially relevant matches.
+
+🛠️ Technology Stack
+
+Based on the current project structure, the application is organized as a web frontend using:
+
+Frontend
+
+HTML
+
+CSS
+
+JavaScript
+
+Deployment
+
+Netlify
+
+Development Tools
+
+Visual Studio Code
+
+Git / GitHub
+
+Browser Developer Tools
+
+📁 Project Structure
+
+The project is organized into HTML pages, CSS, JavaScript, and screenshots.
+
+Campus-Lost-And-Found/
 │
-├── frontend/
-│   ├── components/
-│   ├── pages/
-│   ├── assets/
+├── css/
 │   └── ...
 │
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── models/
+├── js/
 │   └── ...
 │
 ├── screenshots/
-│   ├── login.png
-│   ├── signup.png
 │   ├── dashboard.png
-│   ├── lost-found.png
+│   ├── found.png
+│   ├── login.png
+│   ├── lost.png
+│   ├── match.png
 │   ├── recent-reports.png
-│   ├── report-item.png
-│   └── report-details.png
+│   └── signup.png
 │
+├── .vscode/
+│
+├── admin.html
+├── browse.html
+├── dashboard.html
+├── index.html
+├── matches.html
+├── post-item.html
+├── signup.html
 └── README.md
-```
 
-The `screenshots` directory contains the images used in this README to visually explain the application's functionality.
+The screenshots directory contains the application screenshots used throughout this README.
 
----
+💻 Installation & Setup
 
-# 💻 Installation & Setup
+1. Clone the Repository
 
-## 1. Clone the Repository
-
-```bash
 git clone <repository-url>
-```
 
-## 2. Navigate to the Project
+2. Open the Project
 
-```bash
-cd Lost-And-Found
-```
+Navigate into the project directory:
 
-## 3. Install Dependencies
+cd Campus-Lost-And-Found
 
-```bash
-npm install
-```
+3. Run the Application
 
-> If the project uses a different package manager or separate frontend/backend setup, these commands should be adjusted accordingly.
+Because the project is a web application consisting of HTML, CSS, and JavaScript files, it can be opened using a local development server.
 
-## 4. Configure Environment Variables
+For example, in Visual Studio Code, the project can be run using a local server such as Live Server.
 
-Create the required environment configuration file and add the necessary credentials/configuration.
+Open:
 
-Example:
+index.html
 
-```env
-DATABASE_URL=your_database_url
-API_KEY=your_api_key
-```
+and start the application.
 
-## 5. Start the Application
+4. Live Version
 
-```bash
-npm run dev
-```
+The deployed version is available here:
 
-The application can then be opened in the browser using the local development URL provided by the project.
+https://campuslost-and-found.netlify.app/
 
----
+🔒 Security Considerations
 
-# 🔒 Security Considerations
+Authentication and user-related functionality should be handled carefully in a production environment.
 
-The application includes an authentication layer to prevent unauthorized access to protected functionality.
+Important considerations include:
 
-Important security practices for a production-ready version include:
+Secure password handling
 
-* Password hashing
-* Secure authentication
-* Input validation
-* Authorization checks
-* Protected API endpoints
-* Secure environment variables
-* Database security
+Input validation
 
-Sensitive credentials should never be committed directly into the source-code repository.
+Authentication checks
 
----
+Authorization for protected actions
 
-# 📈 Future Enhancements
+Avoiding exposure of sensitive user information
 
-The project can be extended with several additional features.
+Secure storage of application credentials
 
-## 🔔 Notifications
+Sensitive credentials should never be committed directly to a public repository.
 
-Users could receive notifications when a potentially matching item is reported.
+📈 Future Enhancements
 
-## 🤖 AI-Based Matching
+The project can be extended with additional features.
 
-AI could be used to compare lost and found reports based on:
+🔔 Notifications
 
-* Item description
-* Category
-* Location
-* Date
-* Images
+Users could receive notifications when a potentially matching found item is reported.
 
-This could automatically identify potentially matching reports.
+🤖 Improved AI-Based Matching
 
-## 📍 Location-Based Search
+The current score-based matching approach could be expanded with machine learning or AI to compare:
 
-Users could search for reports near a particular location.
+Item descriptions
 
-## 📷 Image-Based Search
+Images
 
-Users could upload an image of a lost item and the system could search for visually similar found-item reports.
+Locations
 
-## 💬 User Communication
+Dates
 
-A secure messaging system could allow users to communicate regarding a particular report.
+Categories
 
-## 📊 Admin Dashboard
+Additional contextual information
 
-An administrator could manage:
+📍 Location-Based Search
 
-* Users
-* Reports
-* Categories
-* Suspicious reports
-* Resolved cases
+Users could search for reports near a particular campus location.
 
-## ✅ Report Status
+📷 Image-Based Matching
 
-Reports could have statuses such as:
+Users could upload an image of a lost item and the system could identify visually similar found-item reports.
 
-```text
+💬 User Communication
+
+A secure messaging feature could allow users to communicate regarding a potential match.
+
+📊 Admin Dashboard
+
+Administrators could manage:
+
+User accounts
+
+Reports
+
+Suspicious reports
+
+Resolved cases
+
+Report status
+
+✅ Report Status Tracking
+
+Reports could be assigned statuses such as:
+
 Active
 Under Review
+Potential Match
 Matched
 Resolved
 Closed
-```
 
 This would make it easier to track the complete lifecycle of a lost or found item.
 
----
+🌟 Advantages of the System
 
-# 🌟 Advantages of the System
+The Campus Lost & Found platform provides several benefits:
 
-The Lost & Found Management System provides several advantages:
+Centralized lost and found reporting
 
-* Centralized management of reports
-* Easy user registration and login
-* Simple reporting process
-* Faster access to recent reports
-* Organized item information
-* Better visibility of lost and found belongings
-* Reduced dependency on manual processes
-* Scalable architecture for future improvements
+Easy account creation and login
 
----
+Separate lost and found reports
 
-# 🎓 Use Cases
+Quick access to recent reports
 
-The system can be used in:
+Smart match suggestions
 
-* Colleges and Universities
-* Schools
-* Offices
-* Hostels
-* Libraries
-* Shopping Malls
-* Airports
-* Railway Stations
-* Corporate Campuses
-* Public Events
+Transparent match scoring
 
-For example, in a college environment, a student who loses an ID card can submit a lost-item report. Another student who finds the ID card can submit a found-item report. Both reports can then be viewed through the centralized system.
+Simple and clean user interface
 
----
+Reduced manual searching
 
-# 🧪 Testing
+Potential for AI-powered improvements
 
-The application should be tested for different user scenarios.
+🎓 Use Cases
 
-### Authentication Testing
+The system is especially useful in:
 
-* Valid login
-* Invalid login
-* New user registration
-* Duplicate account handling
-* Empty input validation
+Colleges
 
-### Report Testing
+Universities
 
-* Creating a lost-item report
-* Creating a found-item report
-* Viewing reports
-* Opening report details
-* Validating required fields
+Hostels
 
-### UI Testing
+Libraries
 
-* Responsive layout
-* Navigation
-* Form validation
-* Buttons and links
-* Error messages
+Campus offices
 
----
+Student activity areas
 
-# 📸 Complete Application Screenshots
+Laboratories
 
-The following screenshots demonstrate the major parts of the application:
+Cafeterias
 
-| Feature        | Screenshot           |
-| -------------- | -------------------- |
-| Login          | `login.png`          |
-| Sign Up        | `signup.png`         |
-| Dashboard      | `dashboard.png`      |
-| Lost & Found   | `lost-found.png`     |
-| Recent Reports | `recent-reports.png` |
-| Report Item    | `report-item.png`    |
-| Report Details | `report-details.png` |
+Sports facilities
 
-These screenshots provide a visual understanding of how users interact with the application.
+Campus events
 
----
+Example Use Case
 
-# 🚀 Conclusion
+A student loses their wallet on campus.
 
-The Lost & Found Management System provides a centralized and user-friendly platform for managing lost and found belongings.
+The student logs into the application.
 
-The application simplifies the process of reporting items, browsing available reports, and accessing recently submitted information.
+They submit a lost-item report.
 
-With features such as authentication, lost and found reporting, recent reports, and detailed item information, the system provides a foundation that can be further enhanced with AI-based matching, notifications, location-based search, image recognition, and real-time communication.
+Another student later finds a wallet and submits a found-item report.
 
-Overall, the project demonstrates how a digital platform can be used to solve a common real-world problem by making lost-and-found management more organized, accessible, and efficient.
+The application compares the two reports.
 
----
+If the reports share relevant characteristics, a potential match can appear under Smart Match Suggestions.
 
-# 👨‍💻 Project Information
+The original user can review the match score and matching factors.
 
-**Project:** Lost & Found Management System
+This creates a structured digital workflow for reconnecting lost belongings with their owners.
 
-**Type:** Web Application
+🧪 Testing
 
-**Purpose:** Digital management of lost and found items
+The application should be tested using different scenarios.
 
-**Primary Users:** Students / Employees / General Users
+Authentication Testing
 
-**Status:** Development / Academic Project
+Valid login
 
----
+Invalid login
 
-# ⭐ If You Found This Project Useful
+New user registration
 
-If you find this project useful or have suggestions for improvement, feel free to contribute ideas and improvements to the project.
+Empty input validation
 
----
+Incorrect credentials
+
+Report Testing
+
+Creating a lost-item report
+
+Creating a found-item report
+
+Viewing reports
+
+Browsing reports
+
+Checking recent reports
+
+Matching Testing
+
+No lost/found reports available
+
+Only lost reports available
+
+Only found reports available
+
+Both lost and found reports available
+
+Strong match
+
+Possible match
+
+Weak match
+
+UI Testing
+
+Navigation
+
+Buttons and links
+
+Form validation
+
+Responsive layout
+
+Error messages
+
+Screenshot/image rendering
+
+📸 Complete Application Screenshots
+
+Feature
+
+Screenshot
+
+Login Page
+
+login.png
+
+Sign Up Page
+
+signup.png
+
+Dashboard
+
+dashboard.png
+
+Recent Reports
+
+recent-reports.png
+
+Lost Items
+
+lost.png
+
+Found Items
+
+found.png
+
+Smart Match Suggestions
+
+match.png
+
+These screenshots demonstrate the major user-facing screens of the Campus Lost & Found application.
+
+🚀 Conclusion
+
+Campus Lost & Found provides a centralized digital platform for reporting and discovering lost and found belongings within a campus environment.
+
+The application covers the complete basic workflow from user authentication and item reporting to browsing reports and checking potential matches.
+
+A key feature of the project is the Smart Match Suggestions system. Instead of requiring users to manually compare every lost and found report, the application calculates a match score based on relevant report characteristics and presents the strongest potential matches first.
+
+The project provides a practical foundation that can be further improved with AI-based matching, image recognition, notifications, location-based search, messaging, and advanced administration features.
+
+Overall, the application demonstrates how a simple web-based system can solve a real-world campus problem by making lost-and-found management more organized, searchable, and efficient.
+
+👨‍💻 Project Information
+
+Project: Campus Lost & Found
+
+Type: Web Application
+
+Purpose: Digital management of campus lost and found items
+
+Primary Users: Students and campus users
+
+Deployment: Netlify
+
+Status: Academic / Development Project
