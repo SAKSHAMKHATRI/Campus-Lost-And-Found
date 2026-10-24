@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
     message: 'Welcome to Campus Lost & Found Backend API',
     endpoints: {
       health: '/api/health',
-      items: '/api/items (available in Issue #3)'
+      items: '/api/items'
     }
   });
 });

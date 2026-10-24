@@ -7,11 +7,11 @@ Backend REST API for the Campus Lost & Found project built with Node.js, Express
 ```text
 backend/
 ├── config/             # Configuration modules (db.js)
-├── controllers/        # Request handlers & business logic (healthController.js)
+├── controllers/        # Request handlers & business logic (healthController.js, itemController.js)
 ├── middleware/         # Custom Express middlewares (404, global error handler)
 ├── models/             # Mongoose data schemas (Item.js)
-├── routes/             # Express API routes (healthRoutes.js, index.js)
-├── tests/              # Automated tests (health.test.js, item.test.js)
+├── routes/             # Express API routes (healthRoutes.js, itemRoutes.js, index.js)
+├── tests/              # Automated tests (health.test.js, item.test.js, items.test.js)
 ├── .env.example        # Template for required environment variables
 ├── .gitignore          # Backend-specific ignore rules
 ├── app.js              # Express app setup and middleware configuration
@@ -72,14 +72,14 @@ backend/
 
 By default, the server starts on port `5000` (or `process.env.PORT`). If `MONGODB_URI` is not configured, the server starts safely in health-only mode with a helpful console notice.
 
-## Data Models (Issue #2)
+## Data Models
 
 ### Item Model (`backend/models/Item.js`)
 | Field | Type | Required | Details |
 |---|---|---|---|
 | `title` | String | Yes | Name/title of item (min length 3). Also accepts `itemName` |
 | `type` | String | Yes | Enum: `'lost'` or `'found'` |
-| `category` | String | Yes | Category name (e.g., Electronics, Keys, Books) |
+| `category` | String | Yes | Category name (e.g., Electronics, Keys, Books & Notes) |
 | `description` | String | Yes | Description (min length 5) |
 | `location` | String | Yes | Campus zone or location |
 | `date` | Date | Yes | Date lost or found |
@@ -88,32 +88,77 @@ By default, the server starts on port `5000` (or `process.env.PORT`). If `MONGOD
 | `status` | String | No | Enum: `'open'`, `'match-found'`, `'claim-requested'`, `'verified'`, `'returned'` (default `'open'`) |
 | `createdAt` / `updatedAt` | Date | Auto | Managed by Mongoose timestamps |
 
-## Endpoints Implemented
+## API Endpoints (Issue #1 & #3)
 
-### 1. Health Check
-- **URL:** `GET /api/health`
-- **Description:** Verifies service status and operational uptime.
-- **Success Response (200 OK):**
-  ```json
-  {
-    "success": true,
-    "message": "Campus Lost and Found API is healthy and running",
-    "timestamp": "2026-10-23T15:35:00.000Z",
-    "uptime": "12.45s",
-    "environment": "development"
+### 1. System Endpoints
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API welcome banner and endpoint directory |
+| GET | `/api/health` | Service health, uptime, and environment check |
+
+### 2. Item CRUD Endpoints (`/api/items`)
+| Method | Endpoint | Purpose | Query / Params | Success Status |
+|---|---|---|---|---|
+| POST | `/api/items` | Create lost or found report | JSON body required | 201 Created |
+| GET | `/api/items` | List all reports (newest first) | Optional: `?type=lost` or `?type=found` | 200 OK |
+| GET | `/api/items/:id` | Get single report by ID | `:id` (24-char hex ObjectId) | 200 OK |
+| PUT | `/api/items/:id` | Update report fields | `:id`, JSON body | 200 OK |
+| DELETE | `/api/items/:id` | Delete report | `:id` | 200 OK |
+
+### Request & Response Examples
+
+#### Create Item (`POST /api/items`)
+```json
+// Request Body
+{
+  "title": "Blue Hydroflask Bottle",
+  "type": "lost",
+  "category": "Bottles & Lunchboxes",
+  "description": "Lost on the 2nd floor library near silent study area",
+  "location": "Library",
+  "date": "2026-10-24",
+  "color": "Blue"
+}
+
+// 201 Created Response
+{
+  "success": true,
+  "message": "Item report created successfully",
+  "data": {
+    "_id": "671ad190f845a7201c10d321",
+    "title": "Blue Hydroflask Bottle",
+    "type": "lost",
+    "category": "Bottles & Lunchboxes",
+    "description": "Lost on the 2nd floor library near silent study area",
+    "location": "Library",
+    "date": "2026-10-24T00:00:00.000Z",
+    "color": "Blue",
+    "status": "open",
+    "imageUrl": "",
+    "createdAt": "2026-10-25T01:30:00.000Z",
+    "updatedAt": "2026-10-25T01:30:00.000Z"
   }
-  ```
+}
+```
 
-### 2. 404 Route Handling
-- Any request to an undefined route returns HTTP 404 with structured JSON:
-  ```json
-  {
-    "success": false,
-    "message": "Cannot GET /api/unknown - Route not found"
-  }
-  ```
-
-*(Note: CRUD endpoints `/api/items` will be implemented in Issue #3)*
+#### List Items (`GET /api/items?type=lost`)
+```json
+// 200 OK Response
+{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "_id": "671ad190f845a7201c10d321",
+      "title": "Blue Hydroflask Bottle",
+      "type": "lost",
+      "category": "Bottles & Lunchboxes",
+      "location": "Library",
+      "status": "open"
+    }
+  ]
+}
+```
 
 ## Automated Tests
 
@@ -121,4 +166,7 @@ Run the test suite using Node's built-in test runner:
 ```bash
 npm test
 ```
-The suite verifies health routing, 404 handling, and offline Item model schema validations.
+The suite runs 29 tests covering:
+- Health and 404 routing
+- Offline Item schema validation rules
+- Safe in-memory isolated CRUD API endpoint tests (mocked DB, safe from altering real data)
