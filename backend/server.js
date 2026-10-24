@@ -8,12 +8,8 @@ const { connectDB } = require('./config/db');
 
 const PORT = process.env.PORT || 5000;
 
-// Attempt database connection if configured
-if (process.env.MONGODB_URI) {
-  connectDB();
-} else {
-  console.log('Info: MONGODB_URI not set. Ready for Issue #2 database setup.');
-}
+// Connect to MongoDB using environment configuration
+connectDB();
 
 // Start HTTP server
 const server = app.listen(PORT, () => {
@@ -24,8 +20,6 @@ const server = app.listen(PORT, () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error(`Unhandled Rejection Error: ${err.message}`);
-  // In production we might gracefully close the server:
-  // server.close(() => process.exit(1));
 });
 
 module.exports = server;
