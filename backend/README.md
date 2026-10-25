@@ -10,6 +10,7 @@ backend/
 ├── controllers/        # Request handlers & business logic (healthController.js, itemController.js)
 ├── middleware/         # Custom Express middlewares (404, global error handler)
 ├── models/             # Mongoose data schemas (Item.js)
+├── postman/            # Postman API Collection (Campus-Lost-And-Found.postman_collection.json)
 ├── routes/             # Express API routes (healthRoutes.js, itemRoutes.js, index.js)
 ├── tests/              # Automated tests (health.test.js, item.test.js, items.test.js)
 ├── .env.example        # Template for required environment variables
@@ -25,6 +26,7 @@ backend/
 - [Node.js](https://nodejs.org/) (v18 or higher recommended; v20+ supported)
 - npm (installed with Node.js)
 - A MongoDB Atlas account (free M0 cluster) or a local MongoDB instance
+- [Postman](https://www.postman.com/downloads/) (for API testing and evaluation demonstration)
 
 ## Setup & Installation
 
@@ -105,64 +107,48 @@ By default, the server starts on port `5000` (or `process.env.PORT`). If `MONGOD
 | PUT | `/api/items/:id` | Update report fields | `:id`, JSON body | 200 OK |
 | DELETE | `/api/items/:id` | Delete report | `:id` | 200 OK |
 
-### Request & Response Examples
+---
 
-#### Create Item (`POST /api/items`)
-```json
-// Request Body
-{
-  "title": "Blue Hydroflask Bottle",
-  "type": "lost",
-  "category": "Bottles & Lunchboxes",
-  "description": "Lost on the 2nd floor library near silent study area",
-  "location": "Library",
-  "date": "2026-10-24",
-  "color": "Blue"
-}
+## Postman API Collection & Testing (Issue #4)
 
-// 201 Created Response
-{
-  "success": true,
-  "message": "Item report created successfully",
-  "data": {
-    "_id": "671ad190f845a7201c10d321",
-    "title": "Blue Hydroflask Bottle",
-    "type": "lost",
-    "category": "Bottles & Lunchboxes",
-    "description": "Lost on the 2nd floor library near silent study area",
-    "location": "Library",
-    "date": "2026-10-24T00:00:00.000Z",
-    "color": "Blue",
-    "status": "open",
-    "imageUrl": "",
-    "createdAt": "2026-10-25T01:30:00.000Z",
-    "updatedAt": "2026-10-25T01:30:00.000Z"
-  }
-}
-```
+A complete, importable Postman collection is available at:
+`backend/postman/Campus-Lost-And-Found.postman_collection.json`
 
-#### List Items (`GET /api/items?type=lost`)
-```json
-// 200 OK Response
-{
-  "success": true,
-  "count": 1,
-  "data": [
-    {
-      "_id": "671ad190f845a7201c10d321",
-      "title": "Blue Hydroflask Bottle",
-      "type": "lost",
-      "category": "Bottles & Lunchboxes",
-      "location": "Library",
-      "status": "open"
-    }
-  ]
-}
-```
+### Importing into Postman
+1. Open the Postman application.
+2. Click the **Import** button in the top left.
+3. Drag and drop `backend/postman/Campus-Lost-And-Found.postman_collection.json` (or browse to select it).
+4. You will see the **Campus Lost & Found API** collection loaded.
+
+### Collection Variables
+The collection contains two variables:
+- `baseUrl`: The root address of the API.
+  - **Local Development:** Default is `http://localhost:5000`
+  - **Render Deployment (Issue #5):** Simply update the `baseUrl` value to your Render URL (e.g. `https://campus-lost-found.onrender.com`).
+- `itemId`: Automatically captured when you run request `02 - Create Item (POST)` and shared across all subsequent requests.
+
+### Execution Workflow (In Order)
+The collection is structured to test the complete lifecycle:
+1. `01 - Health Check`: Verifies backend service status (HTTP 200).
+2. `02 - Create Item (POST)`: Creates a test record (`[TEST] Dell XPS 65W USB-C Charger`) and stores `_id` into `{{itemId}}` (HTTP 201).
+3. `03 - List All Items (GET)`: Retrieves all reports (HTTP 200).
+4. `04 - Filter Lost Items (GET ?type=lost)`: Verifies query filtering for lost reports (HTTP 200).
+5. `05 - Filter Found Items (GET ?type=found)`: Verifies query filtering for found reports (HTTP 200).
+6. `06 - Get Item By ID (GET)`: Retrieves the test item using `{{itemId}}` (HTTP 200).
+7. `07 - Update Item By ID (PUT)`: Updates status to `'returned'` (HTTP 200).
+8. `08 - Delete Item By ID (DELETE)`: Deletes the test record (HTTP 200).
+9. `09 - Verify Deleted Item Returns 404 (GET)`: Confirms the item is deleted by expecting HTTP 404 Not Found.
+10. `10 - Validation - Empty Body Error (POST 400)`: Tests empty payload rejection (HTTP 400).
+11. `11 - Validation - Invalid Type Filter (GET 400)`: Tests invalid query parameter handling (HTTP 400).
+12. `12 - Validation - Invalid ID Format (GET 400)`: Tests malformed ObjectId handling (HTTP 400).
+
+You can run the entire collection at once using the **Postman Collection Runner** or execute requests individually in order.
+
+---
 
 ## Automated Tests
 
-Run the test suite using Node's built-in test runner:
+Run the backend test suite using Node's built-in test runner:
 ```bash
 npm test
 ```

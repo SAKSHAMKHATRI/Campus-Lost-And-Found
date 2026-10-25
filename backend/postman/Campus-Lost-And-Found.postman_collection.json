@@ -1,0 +1,548 @@
+{
+  "info": {
+    "_postman_id": "b82e4a81-d7fa-4b68-b789-f53835c2e11a",
+    "name": "Campus Lost & Found API",
+    "description": "Comprehensive Postman API Collection for Campus Lost & Found Backend evaluation. Covers health checks, CRUD operations, query filtering, and validation error cases. Supports both localhost and Render Web Service by toggling the {{baseUrl}} variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Health status indicates service is running\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.message).to.include(\"healthy\");",
+              "    pm.expect(jsonData).to.have.property(\"uptime\");",
+              "    pm.expect(jsonData).to.have.property(\"timestamp\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "Verifies that the backend server is up, healthy, and operational."
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Create Item (POST)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201 Created\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Item report is successfully created\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.message).to.eql(\"Item report created successfully\");",
+              "    pm.expect(jsonData.data).to.have.property(\"_id\");",
+              "    pm.expect(jsonData.data.title).to.include(\"[TEST]\");",
+              "    pm.expect(jsonData.data.type).to.eql(\"lost\");",
+              "    pm.expect(jsonData.data.status).to.eql(\"open\");",
+              "",
+              "    // Automatically save created item ID for subsequent requests",
+              "    pm.collectionVariables.set(\"itemId\", jsonData.data._id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"[TEST] Dell XPS 65W USB-C Charger\",\n  \"type\": \"lost\",\n  \"category\": \"Electronics\",\n  \"description\": \"[TEST RECORD] Left on Desk 14 in Library reading hall. Black braided cable.\",\n  \"location\": \"Library\",\n  \"date\": \"2026-10-25\",\n  \"color\": \"Black\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/items",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ]
+        },
+        "description": "Creates a new lost or found report in MongoDB Atlas and captures its _id into {{itemId}}."
+      },
+      "response": []
+    },
+    {
+      "name": "03 - List All Items (GET)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns array of items with count\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.count).to.be.a(\"number\");",
+              "    pm.expect(jsonData.data).to.be.an(\"array\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ]
+        },
+        "description": "Retrieves all reported items sorted with the newest entries first."
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Filter Lost Items (GET ?type=lost)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All returned items match type 'lost'\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.data).to.be.an(\"array\");",
+              "    jsonData.data.forEach(function (item) {",
+              "        pm.expect(item.type).to.eql(\"lost\");",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items?type=lost",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "lost"
+            }
+          ]
+        },
+        "description": "Filters items to return only reports of type 'lost'."
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Filter Found Items (GET ?type=found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All returned items match type 'found'\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.data).to.be.an(\"array\");",
+              "    jsonData.data.forEach(function (item) {",
+              "        pm.expect(item.type).to.eql(\"found\");",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items?type=found",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "found"
+            }
+          ]
+        },
+        "description": "Filters items to return only reports of type 'found'."
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Get Item By ID (GET)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Retrieved item matches the created ID\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.data._id).to.eql(pm.collectionVariables.get(\"itemId\"));",
+              "    pm.expect(jsonData.data.title).to.include(\"[TEST]\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/{{itemId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items",
+            "{{itemId}}"
+          ]
+        },
+        "description": "Fetches single item details using the stored {{itemId}} variable."
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Update Item By ID (PUT)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Item status and description updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.message).to.eql(\"Item report updated successfully\");",
+              "    pm.expect(jsonData.data.status).to.eql(\"returned\");",
+              "    pm.expect(jsonData.data.description).to.include(\"[TEST RECORD - RESOLVED]\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"returned\",\n  \"description\": \"[TEST RECORD - RESOLVED] Item was safely returned to the rightful owner at the student desk.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/items/{{itemId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items",
+            "{{itemId}}"
+          ]
+        },
+        "description": "Updates item status and description via PUT request."
+      },
+      "response": []
+    },
+    {
+      "name": "08 - Delete Item By ID (DELETE)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms item deletion\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.message).to.eql(\"Item report deleted successfully\");",
+              "    pm.expect(jsonData.data.id).to.eql(pm.collectionVariables.get(\"itemId\"));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/{{itemId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items",
+            "{{itemId}}"
+          ]
+        },
+        "description": "Deletes the test item from MongoDB by its ID."
+      },
+      "response": []
+    },
+    {
+      "name": "09 - Verify Deleted Item Returns 404 (GET)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"Returns structured error confirming item was deleted\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "    pm.expect(jsonData.message).to.include(\"Item not found\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/{{itemId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items",
+            "{{itemId}}"
+          ]
+        },
+        "description": "Verifies that querying the deleted ID returns HTTP 404 Not Found."
+      },
+      "response": []
+    },
+    {
+      "name": "10 - Validation - Empty Body Error (POST 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Returns validation error for empty body\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "    pm.expect(jsonData.message).to.include(\"Request body is required\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/items",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ]
+        },
+        "description": "Verifies that submitting an empty payload returns HTTP 400 Bad Request."
+      },
+      "response": []
+    },
+    {
+      "name": "11 - Validation - Invalid Type Filter (GET 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Returns error for unsupported type query\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "    pm.expect(jsonData.message).to.include(\"Invalid type filter\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items?type=stolen",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "stolen"
+            }
+          ]
+        },
+        "description": "Verifies that filtering with an invalid type returns HTTP 400 Bad Request."
+      },
+      "response": []
+    },
+    {
+      "name": "12 - Validation - Invalid ID Format (GET 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Returns error for non-hex ObjectId format\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "    pm.expect(jsonData.message).to.include(\"Invalid item ID format\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/items/invalid-id-format-123",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "items",
+            "invalid-id-format-123"
+          ]
+        },
+        "description": "Verifies that sending a malformed MongoDB ID returns HTTP 400 Bad Request."
+      },
+      "response": []
+    }
+  ]
+}
