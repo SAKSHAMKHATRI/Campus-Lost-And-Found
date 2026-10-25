@@ -85,11 +85,14 @@ function handlePostItem(event) {
     return;
   }
 
+  const originalBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving report...';
 
   const item = {
     id: Date.now(),
     type: type,
+    title: itemName,
     itemName: itemName,
     category: category,
     color: color,
@@ -105,7 +108,17 @@ function handlePostItem(event) {
     createdAt: Date.now()
   };
 
-  addItem(item);
-
-  window.location.href = 'dashboard.html?posted=' + type;
+  try {
+    if (typeof createItemAPI === 'function') {
+      await createItemAPI(item);
+    } else {
+      addItem(item);
+    }
+    window.location.href = 'dashboard.html?posted=' + type;
+  } catch (error) {
+    console.error('Failed to post item to backend:', error);
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+    showAlert('postAlert', error.message || 'Unable to submit report to backend server. Please try again.', 'error');
+  }
 }

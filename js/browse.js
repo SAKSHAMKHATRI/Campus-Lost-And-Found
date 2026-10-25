@@ -21,7 +21,12 @@ function itemMatchesDate(item, filterValue) {
   cutoff.setHours(0, 0, 0, 0);
   cutoff.setDate(cutoff.getDate() - (days - 1));
 
-  const itemDate = new Date(item.date + 'T00:00:00');
+  let dateStr = String(item.date);
+  if (dateStr.includes('T')) {
+    dateStr = dateStr.split('T')[0];
+  }
+
+  const itemDate = new Date(dateStr + 'T00:00:00');
   return itemDate >= cutoff;
 }
 
@@ -32,8 +37,9 @@ function renderItems() {
   const count = document.getElementById('resultCount');
 
   const filtered = allItems.filter(function (item) {
+    const itemName = item.itemName || item.title || '';
     const searchText = [
-      item.itemName,
+      itemName,
       item.category,
       item.color,
       item.location,
@@ -73,7 +79,11 @@ function renderItems() {
       matchesDate;
   });
 
-  filtered.sort((a, b) => b.createdAt - a.createdAt);
+  filtered.sort((a, b) => {
+    const timeA = new Date(a.createdAt || a.date).getTime() || 0;
+    const timeB = new Date(b.createdAt || b.date).getTime() || 0;
+    return timeB - timeA;
+  });
 
   const label = filtered.length === 1 ? 'report' : 'reports';
   count.textContent = `${filtered.length} ${label} found`;
@@ -159,4 +169,25 @@ document.getElementById('filterDate').addEventListener('change', function (event
   renderItems();
 });
 
+// Asynchronously load and synchronize live reports from deployed Render backend
+async function syncBrowseReports() {
+  const count = document.getElementById('resultCount');
+  if (getItems().length === 0 && count) {
+    count.textContent = 'Connecting to server and loading reports...';
+  }
+
+  try {
+    if (typeof fetchItemsAPI === 'function') {
+      const items = await fetchItemsAPI();
+      saveItems(items);
+      renderItems();
+    }
+  } catch (error) {
+    console.warn('Backend sync notice (offline or waking up):', error.message);
+    renderItems();
+  }
+}
+
+// Initial render from local cache, then sync fresh data from API
 renderItems();
+syncBrowseReports();

@@ -1,4 +1,7 @@
-
+// ==========================================
+// Central API Configuration & Endpoints
+// ==========================================
+const API_BASE_URL = window.API_BASE_URL || 'https://campus-lost-and-found-r1d3.onrender.com/api';
 
 // The "keys" (names) under which we store our data in LocalStorage
 const USERS_KEY = 'users';
@@ -7,10 +10,140 @@ const ITEMS_KEY = 'items';
 const CLAIMS_KEY = 'claims';
 const ACTIVITY_KEY = 'adminActivity';
 
+/**
+ * Normalizes an item object returned from MongoDB / API
+ * ensuring backward-compatible field names (id, itemName, title).
+ */
+function normalizeItem(raw) {
+  if (!raw) return null;
+  const item = { ...raw };
+  item.id = item._id || item.id;
+  item.itemName = item.itemName || item.title || 'Untitled Item';
+  item.title = item.title || item.itemName;
+  if (item.date && typeof item.date === 'string' && item.date.includes('T')) {
+    item.date = item.date.split('T')[0];
+  }
+  return item;
+}
 
+/**
+ * Fetch all items from the deployed backend API (MongoDB)
+ * @param {string} [type] - Optional filter ('lost' or 'found')
+ * @returns {Promise<Array>} List of normalized items
+ */
+async function fetchItemsAPI(type) {
+  const url = type
+    ? `${API_BASE_URL}/items?type=${encodeURIComponent(type)}`
+    : `${API_BASE_URL}/items`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Failed to fetch items (HTTP ${response.status})`);
+  }
+
+  const result = await response.json();
+  const items = Array.isArray(result.data) ? result.data.map(normalizeItem) : [];
+
+  // Update local storage cache with live backend data
+  if (!type && items.length > 0) {
+    saveItems(items);
+  }
+  return items;
+}
+
+/**
+ * Create a new lost/found item report on the deployed backend API (MongoDB)
+ * @param {Object} itemData - Item form data
+ * @returns {Promise<Object>} Created and normalized item
+ */
+async function createItemAPI(itemData) {
+  const payload = {
+    title: itemData.itemName || itemData.title,
+    itemName: itemData.itemName || itemData.title,
+    type: itemData.type,
+    category: itemData.category,
+    description: itemData.description,
+    location: itemData.location,
+    date: itemData.date,
+    color: itemData.color || '',
+    verificationDetail: itemData.verificationDetail || '',
+    postedBy: itemData.postedBy || { id: Date.now(), name: 'Student' }
+  };
+
+  const response = await fetch(`${API_BASE_URL}/items`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || `Failed to create report (HTTP ${response.status})`);
+  }
+
+  const createdItem = normalizeItem(result.data);
+  // Also store in local cache
+  addItem(createdItem);
+  return createdItem;
+}
+
+/**
+ * Update an existing report on the deployed backend API (MongoDB)
+ * @param {string} id - Item ID
+ * @param {Object} updateData - Updated fields
+ * @returns {Promise<Object>} Updated item
+ */
+async function updateItemAPI(id, updateData) {
+  const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || `Failed to update report (HTTP ${response.status})`);
+  }
+  return normalizeItem(result.data);
+}
+
+/**
+ * Delete a report from the deployed backend API (MongoDB)
+ * @param {string} id - Item ID
+ * @returns {Promise<boolean>}
+ */
+async function deleteItemAPI(id) {
+  const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || `Failed to delete report (HTTP ${response.status})`);
+  }
+  return true;
+}
+
+/* ---------- Local Cache & Storage Fallbacks ---------- */
 
 // Get the list of registered users.
-// If nothing is stored yet, return an empty array (the || [] trick).
 function getUsers() {
   const stored = localStorage.getItem(USERS_KEY);
   return stored ? JSON.parse(stored) : [];
@@ -39,12 +172,10 @@ function clearCurrentUser() {
   localStorage.removeItem(CURRENT_USER_KEY);
 }
 
-
 // Get all posted items (both lost and found in one list).
-// Every item has a "type" field: 'lost' or 'found'.
 function getItems() {
   const stored = localStorage.getItem(ITEMS_KEY);
-  return stored ? JSON.parse(stored) : [];
+  return stored ? JSON.parse(stored).map(normalizeItem) : [];
 }
 
 // Save all items back into LocalStorage.
@@ -55,14 +186,11 @@ function saveItems(items) {
 // Add one new item (lost or found) to the stored list.
 function addItem(item) {
   const items = getItems();
-  items.push(item);
+  items.unshift(normalizeItem(item));
   saveItems(items);
 }
 
-
-
 // A claim links one LOST item (the claimant) to one FOUND item.
-// Status: 'pending' (waiting for the admin) -> 'approved' or 'rejected'.
 function getClaims() {
   const stored = localStorage.getItem(CLAIMS_KEY);
   return stored ? JSON.parse(stored) : [];
@@ -78,8 +206,6 @@ function addClaim(claim) {
   claims.push(claim);
   saveClaims(claims);
 }
-
-
 
 // A simple history of the admin's actions, shown on the admin dashboard.
 function getActivityLog() {
@@ -98,7 +224,6 @@ function addActivityLog(action, details) {
   if (log.length > 50) log.length = 50;
   saveActivityLog(log);
 }
-
 
 function ensureAdminAccount() {
   const users = getUsers();

@@ -96,3 +96,19 @@ function returnFromTable(itemId) {
 
 renderRecentReports();
 renderMyReports();
+
+// Sync fresh reports from live Render backend
+async function syncDashboard() {
+  try {
+    if (typeof fetchItemsAPI === 'function') {
+      const items = await fetchItemsAPI();
+      saveItems(items);
+      renderRecentReports();
+      renderMyReports();
+    }
+  } catch (err) {
+    console.warn('Dashboard live sync notice:', err.message);
+  }
+}
+
+syncDashboard();

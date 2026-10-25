@@ -744,3 +744,19 @@ document.addEventListener('keydown', function (event) {
 
 // Draw the dashboard on load.
 renderDashboard();
+
+// Sync fresh reports from live Render backend
+async function syncAdminReports() {
+  try {
+    if (typeof fetchItemsAPI === 'function') {
+      const items = await fetchItemsAPI();
+      saveItems(items);
+      renderDashboard();
+      renderReports();
+    }
+  } catch (err) {
+    console.warn('Admin live sync notice:', err.message);
+  }
+}
+
+syncAdminReports();

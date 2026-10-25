@@ -486,3 +486,18 @@ document.addEventListener('keydown', function (event) {
 });
 
 renderMatches();
+
+// Sync fresh reports from live Render backend
+async function syncMatches() {
+  try {
+    if (typeof fetchItemsAPI === 'function') {
+      const items = await fetchItemsAPI();
+      saveItems(items);
+      renderMatches();
+    }
+  } catch (err) {
+    console.warn('Matches live sync notice:', err.message);
+  }
+}
+
+syncMatches();

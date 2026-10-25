@@ -88,11 +88,15 @@ function escapeHTML(text) {
   });
 }
 
-// "2026-08-08" -> "Aug 8, 2026"
+// "2026-08-08" or "2026-08-08T00:00:00.000Z" -> "Aug 8, 2026"
 function formatDate(dateString) {
   if (!dateString) return '—';
-  const date = new Date(dateString + 'T00:00:00'); // treat it as a local date
-  if (isNaN(date.getTime())) return dateString;
+  let dateStr = String(dateString);
+  if (dateStr.includes('T')) {
+    dateStr = dateStr.split('T')[0];
+  }
+  const date = new Date(dateStr + 'T00:00:00'); // treat it as a local date
+  if (isNaN(date.getTime())) return String(dateString);
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
@@ -114,6 +118,7 @@ function fillSelect(selectId, options, placeholder) {
 // The private verification detail is NEVER rendered here.
 function itemCardHTML(item) {
   const isLost = item.type === 'lost';
+  const name = item.itemName || item.title || 'Untitled Item';
   return (
     '<article class="item-card' + (isResolved(item) ? ' item-resolved' : '') + '">' +
       '<div class="item-card-top">' +
@@ -121,13 +126,13 @@ function itemCardHTML(item) {
         statusBadgeHTML(item) +
         '<span class="item-date">' + ICON.calendar + ' ' + formatDate(item.date) + '</span>' +
       '</div>' +
-      '<h3 class="item-name">' + escapeHTML(item.itemName) + '</h3>' +
+      '<h3 class="item-name">' + escapeHTML(name) + '</h3>' +
       '<ul class="item-meta">' +
-        '<li>' + ICON.category + escapeHTML(item.category) + '</li>' +
-        '<li>' + ICON.color + escapeHTML(item.color) + '</li>' +
-        '<li>' + ICON.pin + escapeHTML(item.location) + '</li>' +
+        '<li>' + ICON.category + escapeHTML(item.category || '') + '</li>' +
+        '<li>' + ICON.color + escapeHTML(item.color || '') + '</li>' +
+        '<li>' + ICON.pin + escapeHTML(item.location || '') + '</li>' +
       '</ul>' +
-      '<p class="item-desc">' + escapeHTML(item.description) + '</p>' +
+      '<p class="item-desc">' + escapeHTML(item.description || '') + '</p>' +
       '<p class="item-posted-by">Reported by ' + escapeHTML(item.postedBy ? item.postedBy.name : 'Unknown') + '</p>' +
     '</article>'
   );
@@ -137,8 +142,10 @@ function itemCardHTML(item) {
 
 // How many days apart two dates are (always a positive number).
 function daysBetween(dateA, dateB) {
-  const a = new Date(dateA + 'T00:00:00');
-  const b = new Date(dateB + 'T00:00:00');
+  const aStr = String(dateA).split('T')[0];
+  const bStr = String(dateB).split('T')[0];
+  const a = new Date(aStr + 'T00:00:00');
+  const b = new Date(bStr + 'T00:00:00');
   return Math.abs((a - b) / (1000 * 60 * 60 * 24));
 }
 
