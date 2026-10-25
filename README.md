@@ -24,6 +24,10 @@ Built with a modern monorepo architecture featuring a responsive Vanilla HTML/CS
 - [Screenshots & Visual Tour](#-screenshots--visual-tour)
 - [Subsystem Documentation](#-subsystem-documentation)
 - [System Architecture (MVC)](#-system-architecture-mvc)
+- [Full-Stack System Flowchart](#-full-stack-system-flowchart)
+  - [Architecture & End-to-End Data Flow](#-architecture--end-to-end-data-flow)
+  - [User Journey: Reporting and Recovering an Item](#-user-journey-reporting-and-recovering-an-item)
+  - [CRUD API Request Lifecycles](#-crud-api-request-lifecycles)
 - [REST API Specifications](#-rest-api-specifications)
 - [Technology Stack](#-technology-stack)
 - [Monorepo Project Structure](#-monorepo-project-structure)
@@ -120,6 +124,144 @@ HTTP Request (Browser / Postman / Netlify)
                                                 └── Item.js (Mongoose Model)
                                                         └── Schema validation
                                                         └── Timestamps & normalization
+```
+
+---
+
+## 🔄 Full-Stack System Flowchart
+
+The following interactive flowcharts illustrate the system architecture, student lifecycle, and REST API operations across the monorepo.
+
+### 🌐 Architecture & End-to-End Data Flow
+
+This flowchart illustrates the end-to-end request and response cycle between the student, the Netlify static frontend, the Render Express API, and MongoDB Atlas. The `/api/health` monitoring endpoint is shown as an independent branch.
+
+```mermaid
+flowchart TD
+    subgraph Client["Client Tier (Netlify Deployed)"]
+        User(["👤 Student / Campus User"])
+        UI["🖥️ Frontend UI (HTML5 / CSS3 / JS Pages)"]
+        ClientStorage["📦 API Client (frontend/js/storage.js)"]
+    end
+
+    subgraph Backend["Backend API Tier (Render Deployed)"]
+        Server["🚀 Express Server (backend/server.js & app.js)"]
+        Router{"🔀 API Router (backend/routes/index.js)"}
+        HealthCtrl["💓 Health Controller (backend/controllers/healthController.js)"]
+        ItemCtrl["⚙️ Item Controller (backend/controllers/itemController.js)"]
+        ItemModel[("📄 Mongoose Model (backend/models/Item.js)")]
+    end
+
+    subgraph Database["Database Tier (Cloud Managed)"]
+        Mongo[("🍃 MongoDB Atlas Database")]
+    end
+
+    User -->|"Interacts with UI"| UI
+    UI -->|"Calls API methods"| ClientStorage
+    ClientStorage -->|"HTTPS REST Request"| Server
+    Server -->|"Mounts /api"| Router
+
+    Router -->|"GET /api/health"| HealthCtrl
+    HealthCtrl -->|"200 OK JSON (Status & Uptime)"| Server
+
+    Router -->|"POST, GET, PUT, DELETE /api/items"| ItemCtrl
+    ItemCtrl -->|"Mongoose Validation & Queries"| ItemModel
+    ItemModel -->|"Read / Write Operations"| Mongo
+    Mongo -->|"Query Results / Documents"| ItemModel
+    ItemModel -->|"Mongoose Documents / Virtuals"| ItemCtrl
+    ItemCtrl -->|"Structured JSON Response"| Server
+
+    Server -->|"HTTPS JSON Response"| ClientStorage
+    ClientStorage -->|"Normalizes Data & Updates Cache"| UI
+    UI -->|"Re-renders Views & Updates DOM"| User
+```
+
+### 👤 User Journey: Reporting and Recovering an Item
+
+This diagram maps the complete student journey from authentication and report creation through heuristic matching and item recovery.
+
+```mermaid
+flowchart TD
+    Start(["🚀 User Opens Application"]) --> AuthCheck{"Has Account?"}
+    AuthCheck -->|"No"| SignUp["📝 Sign Up (frontend/signup.html)"]
+    AuthCheck -->|"Yes"| Login["🔑 Login (frontend/index.html)"]
+    SignUp --> Login
+    Login --> Dashboard["📊 User Dashboard (frontend/dashboard.html)"]
+
+    Dashboard --> ActionChoice{"Report Action"}
+    ActionChoice -->|"Lost an item"| FormLost["📋 Fill Lost Report (frontend/post-item.html?type=lost)"]
+    ActionChoice -->|"Found an item"| FormFound["📋 Fill Found Report (frontend/post-item.html?type=found)"]
+
+    FormLost --> SubmitReport["📤 Submit Form"]
+    FormFound --> SubmitReport
+
+    SubmitReport --> FEValidate{"Frontend Validation"}
+    FEValidate -->|"Invalid"| ShowFEAlert["⚠️ Show Validation Error in UI"]
+    ShowFEAlert --> SubmitReport
+
+    FEValidate -->|"Valid"| AsyncAPI["🌐 Async POST /api/items (Render API)"]
+    AsyncAPI --> BEValidate{"Backend & Schema Validation"}
+    BEValidate -->|"Error 400"| ShowBEAlert["⚠️ Return Validation Error"]
+    ShowBEAlert --> SubmitReport
+
+    BEValidate -->|"Valid"| SaveDB[("💾 Save to MongoDB Atlas (201 Created)")]
+    SaveDB --> SyncUI["🔄 Redirect & Refresh Reports (frontend/browse.html)"]
+
+    SyncUI --> RunMatcher["🧠 Run Smart Match Engine (frontend/js/matches.js)"]
+    RunMatcher --> ScoreCheck{"Potential Match Found? (Score > 0)"}
+
+    ScoreCheck -->|"No Match Yet"| WaitState["⏳ Report Stored as Open: Wait for New Reports"]
+    WaitState --> BrowseCatalog["🔍 Check Catalog Later (frontend/browse.html)"]
+    BrowseCatalog --> RunMatcher
+
+    ScoreCheck -->|"Match Found: Score 1-10"| ViewMatches["🎯 View Match Suggestions (frontend/matches.html)"]
+    ViewMatches --> SubmitClaim["📝 Submit Ownership Claim Modal (Claim Notes / Proof)"]
+    SubmitClaim --> ManualVerify["🤝 Manual Campus Contact & Finder Verification"]
+    ManualVerify --> RecoverItem(["✅ Item Recovered & Status Updated to Returned"])
+```
+
+> [!NOTE]
+> **Claim & Ownership Verification:** In accordance with the current platform implementation, claim submissions record the claimant's explanation notes for finder and administrator review. Notifications and direct item handover are coordinated directly between campus users.
+
+### ⚡ CRUD API Request Lifecycles
+
+This diagram illustrates the lifecycle of each REST endpoint, from initial client call and controller validation through MongoDB Atlas database operations and standardized JSON responses.
+
+```mermaid
+flowchart LR
+    subgraph Endpoints["REST API Endpoints"]
+        E1["POST /api/items"]
+        E2["GET /api/items"]
+        E3["GET /api/items/:id"]
+        E4["PUT /api/items/:id"]
+        E5["DELETE /api/items/:id"]
+        E6["GET /api/health"]
+    end
+
+    subgraph Processing["Controller & Database Processing"]
+        P1["Validate Payload & Schema ➔ Save Document"]
+        P2["Parse ?type Filter ➔ Query Items"]
+        P3["Validate 24-char ObjectId ➔ Find Document"]
+        P4["Validate ID & Updates ➔ FindByIdAndUpdate"]
+        P5["Validate ID ➔ FindByIdAndDelete"]
+        P6["Inspect Server Uptime & Environment"]
+    end
+
+    subgraph Responses["Standardized JSON Responses"]
+        R1["201 Created (New Item Object)"]
+        R2["200 OK (count, items array)"]
+        R3["200 OK (Single Item Document)"]
+        R4["200 OK (Updated Document)"]
+        R5["200 OK (Deletion Success Message)"]
+        R6["200 OK (healthy, timestamp, uptime)"]
+    end
+
+    E1 --> P1 --> R1
+    E2 --> P2 --> R2
+    E3 --> P3 --> R3
+    E4 --> P4 --> R4
+    E5 --> P5 --> R5
+    E6 --> P6 --> R6
 ```
 
 ---
