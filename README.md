@@ -2,7 +2,7 @@
 
 A full-stack Campus Lost & Found web platform engineered to make reporting, browsing, matching, and recovering lost and found items seamless across a college campus.
 
-Built with a responsive Vanilla HTML/CSS/JavaScript frontend and a robust Node.js/Express MVC backend backed by MongoDB Atlas and deployed on Render and Netlify.
+Built with a modern monorepo architecture featuring a responsive Vanilla HTML/CSS/JavaScript client in [`frontend/`](./frontend/README.md) and a robust Node.js/Express MVC REST API in [`backend/`](./backend/README.md) backed by MongoDB Atlas, deployed across Render and Netlify.
 
 ---
 
@@ -22,12 +22,15 @@ Built with a responsive Vanilla HTML/CSS/JavaScript frontend and a robust Node.j
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
 - [Screenshots & Visual Tour](#-screenshots--visual-tour)
+- [Subsystem Documentation](#-subsystem-documentation)
 - [System Architecture (MVC)](#-system-architecture-mvc)
 - [REST API Specifications](#-rest-api-specifications)
 - [Technology Stack](#-technology-stack)
 - [Monorepo Project Structure](#-monorepo-project-structure)
 - [Local Installation & Setup](#-local-installation--setup)
-- [Render Deployment Guide](#-render-deployment-guide)
+- [Deployment Guides](#-deployment-guides)
+  - [Netlify Frontend Deployment](#1-netlify-frontend-deployment)
+  - [Render Backend Deployment](#2-render-backend-deployment)
 - [Postman API Testing](#-postman-api-testing)
 - [Smart Matching Algorithm](#-smart-matching-algorithm)
 - [Security & Environment Rules](#-security--environment-rules)
@@ -60,31 +63,40 @@ In busy college campuses, students frequently misplace valuable belongings — f
 
 ### Login Page
 Allows registered students and campus administrators to securely access the platform.
-![Login Page](./screenshots/login.png)
+![Login Page](./frontend/screenshots/login.png)
 
 ### Sign Up Page
 Enables new campus users to create an account with campus email and name.
-![Sign Up Page](./screenshots/signup.png)
+![Sign Up Page](./frontend/screenshots/signup.png)
 
 ### Student Dashboard
 Central hub showing quick reporting actions, recent campus activity, and personal report tracking.
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./frontend/screenshots/dashboard.png)
 
 ### Recent Reports
 Displays the latest lost and found items submitted across campus.
-![Recent Reports](./screenshots/recent-reports.png)
+![Recent Reports](./frontend/screenshots/recent-reports.png)
 
 ### Post Lost Item
 Structured reporting form to describe lost items with campus zone dropdowns and date validation.
-![Lost Items](./screenshots/lost.png)
+![Lost Items](./frontend/screenshots/lost.png)
 
 ### Post Found Item
 Allows finders to report found belongings and record an optional private verification detail for claimant validation.
-![Found Items](./screenshots/found.png)
+![Found Items](./frontend/screenshots/found.png)
 
 ### Smart Match Suggestions
 Analyzes lost and found reports to surface potential matches with transparent score breakdowns.
-![Smart Match Suggestions](./screenshots/match.png)
+![Smart Match Suggestions](./frontend/screenshots/match.png)
+
+---
+
+## 📚 Subsystem Documentation
+
+Detailed guides and implementation notes for each subsystem are maintained in their respective directories:
+
+- 🖥️ **Frontend Documentation:** [`frontend/README.md`](./frontend/README.md) — Client architecture, UI features, LocalStorage caching, API integration, and Netlify configuration.
+- ⚙️ **Backend Documentation:** [`backend/README.md`](./backend/README.md) — Express MVC server, Mongoose data models, error handling, test suite, and Render container configuration.
 
 ---
 
@@ -98,92 +110,46 @@ HTTP Request (Browser / Postman / Netlify)
    ▼
 [app.js] ──────── CORS Policy & JSON Body Parsers
    │
-   ▼
-[routes/index.js] ── Aggregates API endpoints
-   ├── /api/health   ──> [controllers/healthController.js]
-   └── /api/items    ──> [controllers/itemController.js]
-                            │
-                            ├── Reads/Writes via [models/Item.js] (Mongoose Schema)
-                            │        │
-                            │        ▼
-                            │   MongoDB Atlas Cloud Database
-                            │
-                            └── Global Error Boundary [middleware/errorHandler.js]
+   ├──▶ [/api/health] ──▶ healthController.js
+   │                         └── Returns server health, timestamp, and uptime
+   │
+   └──▶ [/api/items]  ──▶ itemRoutes.js ──▶ itemController.js
+                                                │
+                                                ├── Validate ID & payload
+                                                ├── Query MongoDB Atlas
+                                                └── Item.js (Mongoose Model)
+                                                        └── Schema validation
+                                                        └── Timestamps & normalization
 ```
-
-### MVC Directory Responsibilities
-- **Models (`backend/models/Item.js`):** Defines the Mongoose schema, field validations, enum restrictions, timestamps, and backward-compatible virtuals (`itemName` ↔ `title`).
-- **Controllers (`backend/controllers/`):** Contains business logic for health reporting and CRUD operations (`createItem`, `getItems`, `getItemById`, `updateItem`, `deleteItem`).
-- **Routes (`backend/routes/`):** Declares endpoint URL paths and maps them to controller functions.
-- **Middleware (`backend/middleware/`):** Centralizes 404 route handling and error sanitization (preventing credential or stack trace leaks).
-- **Config (`backend/config/db.js`):** Manages safe connection and disconnection lifecycles with MongoDB Atlas.
 
 ---
 
-## 🔌 REST API Specifications
+## 📡 REST API Specifications
 
-Base URL: `https://campus-lost-and-found-r1d3.onrender.com/api` (Production) or `http://localhost:5000/api` (Local)
+The backend exposes standardized JSON REST endpoints mounted under `/api`:
 
-### 1. System Endpoints
-| Method | Endpoint | Description | Status Code |
-|---|---|---|---|
-| `GET` | `/` | API welcome banner and endpoint directory | 200 OK |
-| `GET` | `/api/health` | Service uptime, timestamp, and environment | 200 OK |
-
-### 2. Item CRUD Endpoints
-| Method | Endpoint | Description | Query / Params | Success Status |
+| Method | Endpoint | Description | Request Body | Success Response |
 |---|---|---|---|---|
-| `POST` | `/api/items` | Create a lost or found report | JSON Request Body | `201 Created` |
-| `GET` | `/api/items` | List reports (sorted newest first) | `?type=lost` or `?type=found` | `200 OK` |
-| `GET` | `/api/items/:id` | Retrieve single item report by ID | `:id` (24-char hex ObjectId) | `200 OK` |
-| `PUT` | `/api/items/:id` | Update report fields or status | `:id`, JSON update body | `200 OK` |
-| `DELETE`| `/api/items/:id` | Delete report from database | `:id` | `200 OK` |
-
-### Sample Payload: Create Item (`POST /api/items`)
-```json
-{
-  "title": "Black HP Laptop Bag",
-  "type": "lost",
-  "category": "Bags & Backpacks",
-  "description": "Left on 2nd floor library reading desk. Contains notebook and charger.",
-  "location": "Library",
-  "date": "2026-10-25",
-  "color": "Black"
-}
-```
-
-### Sample Response (`201 Created`):
-```json
-{
-  "success": true,
-  "message": "Item report created successfully",
-  "data": {
-    "_id": "6add1ad8ac2b0385c7b5b7de",
-    "title": "Black HP Laptop Bag",
-    "type": "lost",
-    "category": "Bags & Backpacks",
-    "description": "Left on 2nd floor library reading desk. Contains notebook and charger.",
-    "location": "Library",
-    "date": "2026-10-25T00:00:00.000Z",
-    "color": "Black",
-    "status": "open",
-    "imageUrl": "",
-    "createdAt": "2026-10-25T13:00:00.000Z",
-    "updatedAt": "2026-10-25T13:00:00.000Z"
-  }
-}
-```
+| `GET` | `/` | API Root Welcome | None | `200 OK` (Service metadata) |
+| `GET` | `/api/health` | Health Check & Uptime | None | `200 OK` (`status: "healthy"`) |
+| `POST` | `/api/items` | Create Lost/Found Report | `title`, `type`, `category`, `description`, `location`, `date`, `color` | `201 Created` (`data: Item`) |
+| `GET` | `/api/items` | List All Reports | None | `200 OK` (`count`, `data: Item[]`) |
+| `GET` | `/api/items?type=lost` | Filter Lost Reports | None | `200 OK` (Only lost items) |
+| `GET` | `/api/items?type=found`| Filter Found Reports | None | `200 OK` (Only found items) |
+| `GET` | `/api/items/:id` | Get Report by ID | None | `200 OK` (`data: Item`) |
+| `PUT` | `/api/items/:id` | Update Report by ID | Partial or full item fields | `200 OK` (`data: updatedItem`) |
+| `DELETE` | `/api/items/:id` | Delete Report by ID | None | `200 OK` (`message: "Item deleted"`) |
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend:** HTML5, CSS3 (Vanilla design system), JavaScript (ES6+), Fetch API
-- **Backend Framework:** Node.js, Express.js
-- **Database & ODM:** MongoDB Atlas, Mongoose
-- **API Testing:** Postman Collection v2.1.0, Node.js Native Test Runner (`node:test`)
+- **Frontend:** HTML5, CSS3 (Custom Responsive Design System), JavaScript (ES6+ Modules, Fetch API, LocalStorage Cache)
+- **Backend:** Node.js, Express.js (MVC Architecture, CORS, Router Middleware)
+- **Database:** MongoDB Atlas (Cloud Managed NoSQL) via Mongoose ODM
+- **Automated Testing:** Node.js Built-in Test Runner (`node:test`, `node:assert`)
+- **API Tooling:** Postman Collection v2.1.0 with dynamic ID chaining and automated tests
 - **Cloud Deployment:** Netlify (Frontend CDN), Render (Backend Web Service container)
-- **Version Control & CI/CD:** Git, GitHub
 
 ---
 
@@ -191,17 +157,38 @@ Base URL: `https://campus-lost-and-found-r1d3.onrender.com/api` (Production) or 
 
 ```text
 Campus-Lost-And-Found/
-├── backend/
+├── frontend/                     # Client application (HTML, CSS, JS)
+│   ├── css/
+│   │   └── style.css             # Unified responsive design system
+│   ├── js/
+│   │   ├── admin.js              # Admin portal controller
+│   │   ├── auth.js               # Client authentication & session management
+│   │   ├── browse.js             # Live browse, search & query filters
+│   │   ├── dashboard.js          # Student dashboard & quick stats
+│   │   ├── items.js              # Shared formatting and card builders
+│   │   ├── matches.js            # Smart matching heuristic algorithm
+│   │   ├── post-item.js          # Item post handler with API integration
+│   │   └── storage.js            # Central API client & local cache fallback
+│   ├── screenshots/              # Application UI screenshots
+│   ├── admin.html                # Admin management view
+│   ├── browse.html               # Browse lost & found catalog
+│   ├── dashboard.html            # User dashboard
+│   ├── index.html                # Welcome & login view
+│   ├── matches.html              # Smart match suggestion view
+│   ├── post-item.html            # Report posting form
+│   ├── signup.html               # Registration view
+│   └── README.md                 # Frontend technical documentation
+├── backend/                      # Node.js/Express MVC REST API
 │   ├── config/
-│   │   └── db.js                 # Safe MongoDB Atlas connection handling
+│   │   └── db.js                 # Safe MongoDB Atlas connection & error masking
 │   ├── controllers/
 │   │   ├── healthController.js   # Health check controller
-│   │   └── itemController.js     # Item CRUD business logic
+│   │   └── itemController.js     # Full CRUD controller (create, list, get, update, delete)
 │   ├── middleware/
 │   │   ├── errorHandler.js       # Central JSON error handling & Mongoose formatters
 │   │   └── notFoundHandler.js    # Standardized 404 JSON response
 │   ├── models/
-│   │   └── Item.js               # Mongoose schema and validation rules
+│   │   └── Item.js               # Mongoose schema, validation rules & field virtuals
 │   ├── postman/
 │   │   └── Campus-Lost-And-Found.postman_collection.json  # Exported Postman suite
 │   ├── routes/
@@ -218,30 +205,12 @@ Campus-Lost-And-Found/
 │   ├── package.json              # Backend dependencies and scripts
 │   ├── README.md                 # Backend technical documentation
 │   └── server.js                 # Server entry point & graceful container shutdown
-├── css/
-│   └── style.css                 # Core CSS design system
-├── js/
-│   ├── admin.js                  # Admin portal controller
-│   ├── auth.js                   # Client authentication logic
-│   ├── browse.js                 # Live browse and query filters
-│   ├── dashboard.js              # Student dashboard controller
-│   ├── items.js                  # Shared formatting and card builders
-│   ├── matches.js                # Smart matching heuristic algorithm
-│   ├── post-item.js              # Item post handler with API integration
-│   └── storage.js                # Central API client & local cache fallback
-├── screenshots/                  # Application UI screenshots
 ├── docs/
 │   └── BACKEND_MASTER_PLAN.md    # Master architectural roadmap
 ├── issues/                       # Evaluation tracking issues
-├── admin.html                    # Admin management view
-├── browse.html                   # Browse lost & found catalog
-├── dashboard.html                # User dashboard
-├── index.html                    # Welcome & login view
-├── matches.html                  # Smart match suggestion view
-├── post-item.html                # Report posting form
-├── signup.html                   # Registration view
+├── netlify.toml                  # Netlify monorepo deployment configuration
 ├── .gitignore                    # Root Git ignore rules
-└── README.md                     # Main repository documentation
+└── README.md                     # Main repository documentation (this file)
 ```
 
 ---
@@ -282,20 +251,45 @@ npm test
 ```
 
 ### 3. Frontend Setup
-Because the frontend is built with vanilla HTML, CSS, and JavaScript, it can be launched using any local web server (e.g. VS Code **Live Server** or Python HTTP server):
+Because the frontend is built with vanilla HTML, CSS, and JavaScript, it can be launched using any static local server:
 ```bash
 # From repository root:
-npx serve .
-# Or open index.html directly in your browser
+npx serve frontend
+
+# Or using Python from inside frontend/:
+cd frontend && python3 -m http.server 8080
 ```
+Or open [`frontend/index.html`](./frontend/index.html) directly using VS Code **Live Server**.
 
 ---
 
-## ☁️ Render Deployment Guide
+## ☁️ Deployment Guides
+
+### 1. Netlify Frontend Deployment
+
+The static frontend in `frontend/` is deployed to Netlify:
+
+#### Monorepo Build Configuration
+The repository includes [`netlify.toml`](./netlify.toml) in the root:
+```toml
+[build]
+  publish = "frontend"
+```
+
+#### Netlify Dashboard Settings:
+If setting up or verifying the Netlify site in the Netlify Dashboard:
+- **Site Name:** `campuslost-and-found`
+- **Base directory:** *(leave empty)*
+- **Publish directory:** `frontend`
+- **Build command:** *(leave empty)*
+
+---
+
+### 2. Render Backend Deployment
 
 The backend is configured for direct deployment as a **Render Web Service** connected to the GitHub repository:
 
-### Render Monorepo Settings
+#### Render Monorepo Settings
 - **Repository:** `SAKSHAMKHATRI/Campus-Lost-And-Found`
 - **Branch:** `main`
 - **Runtime:** `Node`
@@ -304,7 +298,7 @@ The backend is configured for direct deployment as a **Render Web Service** conn
 - **Start Command:** `npm start`
 - **Health Check Path:** `/api/health`
 
-### Render Environment Variables
+#### Render Environment Variables
 - `NODE_ENV` = `production`
 - `CLIENT_ORIGIN` = `https://campuslost-and-found.netlify.app`
 - `MONGODB_URI` = *(Entered securely into the Render Dashboard)*
@@ -328,7 +322,7 @@ An importable Postman collection containing 12 pre-configured requests with auto
 
 ## 🧠 Smart Matching Algorithm
 
-The matching engine in `js/matches.js` scores potential relationships between lost and found items on a scale of **0 to 10**:
+The matching engine in [`frontend/js/matches.js`](./frontend/js/matches.js) scores potential relationships between lost and found items on a scale of **0 to 10**:
 
 1. **Category Match (+3 points):** Lost and found reports share the exact same category.
 2. **Campus Location (+2 points):** Both reports occurred in the same campus zone (e.g. Library).
