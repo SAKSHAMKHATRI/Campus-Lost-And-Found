@@ -27,8 +27,9 @@ backend/
 - npm (installed with Node.js)
 - A MongoDB Atlas account (free M0 cluster) or a local MongoDB instance
 - [Postman](https://www.postman.com/downloads/) (for API testing and evaluation demonstration)
+- A [Render](https://render.com/) account for cloud deployment
 
-## Setup & Installation
+## Setup & Local Installation
 
 1. Navigate to the `backend/` directory:
    ```bash
@@ -50,17 +51,18 @@ backend/
 
 1. **Sign up / Log in:** Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and create a free Shared cluster (M0).
 2. **Database User:** Navigate to **Security > Database Access** and create a user (e.g. `campusAdmin`) with password authentication and `readWriteAnyDatabase` privileges.
-3. **Network Access (IP Whitelist):**
+3. **Network Access (IP Whitelist for Local & Render):**
    - Navigate to **Security > Network Access**.
    - Click **Add IP Address**.
-   - For development and cloud hosting (Render), select **Allow Access from Anywhere** (`0.0.0.0/0`).
+   - Select **Allow Access from Anywhere** (`0.0.0.0/0`).
+   - *Why `0.0.0.0/0` is required for Render:* Cloud platforms like Render assign dynamic outbound IP addresses that change across redeploys. Access is secured by your database username and strong password.
 4. **Connection String:**
    - Go to **Database > Clusters > Connect > Drivers (Node.js)**.
    - Copy the connection string:
      `mongodb+srv://<username>:<password>@cluster0.mongodb.net/campus-lost-found?retryWrites=true&w=majority`
    - Paste it into your local `.env` file as `MONGODB_URI` and replace `<username>` and `<password>` with your database user credentials.
 
-## Running the Server
+## Running Locally
 
 - **Development mode** (with auto-reload via nodemon):
   ```bash
@@ -109,40 +111,90 @@ By default, the server starts on port `5000` (or `process.env.PORT`). If `MONGOD
 
 ---
 
-## Postman API Collection & Testing (Issue #4)
+## Render Cloud Deployment Guide (Issue #5)
+
+The backend is configured for direct deployment as a **Render Web Service** from this GitHub repository (`SAKSHAMKHATRI/Campus-Lost-And-Found`).
+
+### Live Deployed Backend URL
+- **Production URL:** `https://<YOUR-RENDER-SERVICE-NAME>.onrender.com`
+- **Public Health Endpoint:** `https://<YOUR-RENDER-SERVICE-NAME>.onrender.com/api/health`
+
+*(Replace `<YOUR-RENDER-SERVICE-NAME>` with your actual service slug created on Render)*
+
+### Monorepo Configuration on Render
+Because this repository holds both frontend files at the root and backend files in `backend/`, configure the following fields in the Render dashboard:
+
+| Setting | Value | Why it's needed |
+|---|---|---|
+| **Repository** | `https://github.com/SAKSHAMKHATRI/Campus-Lost-And-Found` | Connects your GitHub repo |
+| **Branch** | `main` | Deploys verified commits from main |
+| **Environment** | `Node` | Runtime environment |
+| **Root Directory** | `backend` | **Crucial:** Tells Render to run build and start commands inside `backend/` |
+| **Build Command** | `npm install` | Installs production dependencies |
+| **Start Command** | `npm start` | Executes `node server.js` |
+| **Health Check Path** | `/api/health` | Render automatically pings this to verify deployment health before routing traffic |
+
+### Required Environment Variables on Render
+Add these under **Environment** in the Render Web Service settings:
+
+| Variable | Value | Purpose |
+|---|---|---|
+| `NODE_ENV` | `production` | Optimizes Express and disables sensitive stack traces |
+| `MONGODB_URI` | `mongodb+srv://...` | Your live MongoDB Atlas connection string (entered directly into Render, never committed) |
+| `CLIENT_ORIGIN` | `https://campuslost-and-found.netlify.app` | Configures CORS to allow browser requests from your live Netlify frontend |
+
+> [!IMPORTANT]
+> **Do not hardcode or set `PORT` in Render environment settings.** Render automatically assigns a dynamic port via `process.env.PORT`. `backend/server.js` listens on `0.0.0.0` and automatically binds to Render's assigned port.
+
+### Step-by-Step Deployment Instructions
+1. Log in to [dashboard.render.com](https://dashboard.render.com).
+2. Click **New +** > **Web Service**.
+3. Choose **Build and deploy from a Git repository** and connect `SAKSHAMKHATRI/Campus-Lost-And-Found`.
+4. Configure service parameters:
+   - **Name:** `campus-lost-and-found-backend` (or your preferred name)
+   - **Root Directory:** `backend`
+   - **Runtime:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+5. Click **Advanced** and set **Health Check Path** to `/api/health`.
+6. Add the **Environment Variables** (`NODE_ENV`, `MONGODB_URI`, `CLIENT_ORIGIN`).
+7. Click **Create Web Service**.
+8. Inspect the **Logs** tab. Verify the following output:
+   ```text
+   [MongoDB] Connected successfully to host: ...
+   Campus Lost & Found backend listening on 0.0.0.0:10000 [env: production]
+   Health check available at /api/health
+   ==> Your service is live 🎉
+   ```
+
+### Post-Deployment Verification
+1. **Verify Health Endpoint:**
+   Open `https://<YOUR-RENDER-SERVICE-NAME>.onrender.com/api/health` in your browser. It should return HTTP 200 with:
+   ```json
+   {
+     "success": true,
+     "message": "Campus Lost and Found API is healthy and running",
+     "environment": "production"
+   }
+   ```
+2. **Run Postman Against Render:**
+   In your Postman collection:
+   - Click the collection name **Campus Lost & Found API**.
+   - Under the **Variables** tab, change the `baseUrl` value from `http://localhost:5000` to `https://<YOUR-RENDER-SERVICE-NAME>.onrender.com`.
+   - Run the collection runner. All 12 requests (health, create, filter, update, delete, 404, validations) will execute against the cloud server and pass with green checkmarks!
+
+---
+
+## Postman API Collection (Issue #4)
 
 A complete, importable Postman collection is available at:
 `backend/postman/Campus-Lost-And-Found.postman_collection.json`
 
 ### Importing into Postman
 1. Open the Postman application.
-2. Click the **Import** button in the top left.
-3. Drag and drop `backend/postman/Campus-Lost-And-Found.postman_collection.json` (or browse to select it).
-4. You will see the **Campus Lost & Found API** collection loaded.
-
-### Collection Variables
-The collection contains two variables:
-- `baseUrl`: The root address of the API.
-  - **Local Development:** Default is `http://localhost:5000`
-  - **Render Deployment (Issue #5):** Simply update the `baseUrl` value to your Render URL (e.g. `https://campus-lost-found.onrender.com`).
-- `itemId`: Automatically captured when you run request `02 - Create Item (POST)` and shared across all subsequent requests.
-
-### Execution Workflow (In Order)
-The collection is structured to test the complete lifecycle:
-1. `01 - Health Check`: Verifies backend service status (HTTP 200).
-2. `02 - Create Item (POST)`: Creates a test record (`[TEST] Dell XPS 65W USB-C Charger`) and stores `_id` into `{{itemId}}` (HTTP 201).
-3. `03 - List All Items (GET)`: Retrieves all reports (HTTP 200).
-4. `04 - Filter Lost Items (GET ?type=lost)`: Verifies query filtering for lost reports (HTTP 200).
-5. `05 - Filter Found Items (GET ?type=found)`: Verifies query filtering for found reports (HTTP 200).
-6. `06 - Get Item By ID (GET)`: Retrieves the test item using `{{itemId}}` (HTTP 200).
-7. `07 - Update Item By ID (PUT)`: Updates status to `'returned'` (HTTP 200).
-8. `08 - Delete Item By ID (DELETE)`: Deletes the test record (HTTP 200).
-9. `09 - Verify Deleted Item Returns 404 (GET)`: Confirms the item is deleted by expecting HTTP 404 Not Found.
-10. `10 - Validation - Empty Body Error (POST 400)`: Tests empty payload rejection (HTTP 400).
-11. `11 - Validation - Invalid Type Filter (GET 400)`: Tests invalid query parameter handling (HTTP 400).
-12. `12 - Validation - Invalid ID Format (GET 400)`: Tests malformed ObjectId handling (HTTP 400).
-
-You can run the entire collection at once using the **Postman Collection Runner** or execute requests individually in order.
+2. Click **Import** in the top left.
+3. Drag and drop `backend/postman/Campus-Lost-And-Found.postman_collection.json`.
+4. Run requests in sequence (01 to 12) or use the Postman Collection Runner.
 
 ---
 

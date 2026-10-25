@@ -11,5 +11,7 @@ logs/
 *.log
 npm-debug.log*
 
-# Operating System
+# Operating System & Tool Caches
 .DS_Store
+.postman/
+postman/
