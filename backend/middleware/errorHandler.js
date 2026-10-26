@@ -18,6 +18,13 @@ const errorHandler = (err, req, res, next) => {
     message = `Invalid resource identifier: ${err.value}`;
   }
 
+  // Handle MongoDB Duplicate Key Error (e.g. duplicate unique email)
+  if (err.code === 11000) {
+    statusCode = 400;
+    const field = Object.keys(err.keyValue || {})[0] || 'field';
+    message = `${field === 'email' ? 'This email' : 'This value'} is already registered. Please login.`;
+  }
+
   const response = {
     success: false,
     message: message

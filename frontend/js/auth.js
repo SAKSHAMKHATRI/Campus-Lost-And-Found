@@ -1,5 +1,5 @@
 
-function handleSignup(event) {
+async function handleSignup(event) {
   event.preventDefault(); // stop the page from reloading
 
   // Read what the user typed in the form (.trim() removes extra spaces)
@@ -8,7 +8,7 @@ function handleSignup(event) {
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
 
-  // ---- Form validation (feature #10) ----
+  // ---- Form validation ----
   if (name === '') {
     return showAlert('signupAlert', 'Please enter your name.', 'error');
   }
@@ -22,34 +22,33 @@ function handleSignup(event) {
     return showAlert('signupAlert', 'Passwords do not match.', 'error');
   }
 
-  // Check that this email is not already registered
-  const users = getUsers();
-  const emailAlreadyUsed = users.some(user => user.email === email);
-  if (emailAlreadyUsed) {
-    return showAlert('signupAlert', 'This email is already registered. Please login.', 'error');
+  // Submit button loading state
+  const submitBtn = event.target ? event.target.querySelector('button[type="submit"]') : null;
+  const originalBtnText = submitBtn ? submitBtn.textContent : 'Create Account';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating Account...';
   }
 
-  // Create the new user object and add it to the list
-  const newUser = {
-    id: Date.now(),   // simple unique id (current time in milliseconds)
-    name: name,
-    email: email,
-    password: password, // NOTE: plain password is ONLY ok for this demo
-    role: 'user',       // normal users can never access the admin panel
-    active: true        // new accounts are active by default
-  };                    // (see note on the signup page)
+  try {
+    // Send registration request to backend API
+    await registerUserAPI({ name, email, password });
 
-  users.push(newUser);
-  saveUsers(users);   // save the updated list into LocalStorage
-
-  // Go to the login page with "?signup=success" so it can show a green message
-  window.location.href = 'index.html?signup=success';
+    // Go to the login page with "?signup=success" so it can show a green message
+    window.location.href = 'index.html?signup=success';
+  } catch (error) {
+    showAlert('signupAlert', error.message || 'Registration failed. Please try again.', 'error');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+  }
 }
 
 /* ---------- LOGIN ---------- */
 
 // Runs when the Login form is submitted.
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
 
   const email = document.getElementById('email').value.trim().toLowerCase();
@@ -59,31 +58,49 @@ function handleLogin(event) {
     return showAlert('loginAlert', 'Please enter your email and password.', 'error');
   }
 
-  // Look for a user whose email AND password both match
-  const users = getUsers();
-  const user = users.find(u => u.email === email && u.password === password);
-
-  if (!user) {
-    return showAlert('loginAlert', 'Wrong email or password. Please try again.', 'error');
+  // Submit button loading state
+  const submitBtn = event.target ? event.target.querySelector('button[type="submit"]') : null;
+  const originalBtnText = submitBtn ? submitBtn.textContent : 'Login';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
   }
 
-  // Deactivated users cannot log in (admin can disable accounts).
-  if (user.active === false) {
-    return showAlert('loginAlert', 'This account has been deactivated by the admin. Please contact the campus admin.', 'error');
+  try {
+    // Authenticate user with backend API
+    const result = await loginUserAPI({ email, password });
+
+    if (result.token) {
+      saveAuthToken(result.token);
+    }
+
+    const user = {
+      id: result.data.id || result.data._id,
+      name: result.data.name,
+      email: result.data.email,
+      role: result.data.role || 'user',
+      active: result.data.active !== false,
+      token: result.token
+    };
+
+    saveCurrentUser(user);
+
+    // Go to the main app page
+    window.location.href = 'dashboard.html';
+  } catch (error) {
+    showAlert('loginAlert', error.message || 'Wrong email or password. Please try again.', 'error');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
   }
-
-  // Save this user as the current user => they are now "logged in"
-  saveCurrentUser(user);
-
-  // Go to the main app page
-  window.location.href = 'dashboard.html';
 }
 
 /* ---------- LOGOUT ---------- */
 
 // Runs when the Logout button is clicked.
 function logout() {
-  clearCurrentUser();                  // remove the session
+  clearCurrentUser();                  // remove the session and auth token
   window.location.href = 'index.html'; // go back to the login page
 }
 
