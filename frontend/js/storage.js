@@ -1,11 +1,18 @@
 // ==========================================
 // Central API Configuration & Endpoints
-// ==========================================
-const API_BASE_URL = window.API_BASE_URL || 'https://campus-lost-and-found-r1d3.onrender.com/api';
+const isLocalDev = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const API_BASE_URL = window.API_BASE_URL || (
+  isLocalDev
+    ? 'http://localhost:5000/api'
+    : 'https://campus-lost-and-found-r1d3.onrender.com/api'
+);
 
 // The "keys" (names) under which we store our data in LocalStorage
 const USERS_KEY = 'users';
 const CURRENT_USER_KEY = 'currentUser';
+const AUTH_TOKEN_KEY = 'authToken';
 const ITEMS_KEY = 'items';
 const CLAIMS_KEY = 'claims';
 const ACTIVITY_KEY = 'adminActivity';
@@ -141,6 +148,54 @@ async function deleteItemAPI(id) {
   return true;
 }
 
+/**
+ * Register a new user via backend API
+ * @param {Object} userData - { name, email, password }
+ * @returns {Promise<Object>} API response with user data and token
+ */
+async function registerUserAPI(userData) {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(userData)
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || `Registration failed (HTTP ${response.status})`);
+  }
+
+  return result;
+}
+
+/**
+ * Authenticate user with backend API
+ * @param {Object} credentials - { email, password }
+ * @returns {Promise<Object>} API response with user data and token
+ */
+async function loginUserAPI(credentials) {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(credentials)
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || `Login failed (HTTP ${response.status})`);
+  }
+
+  return result;
+}
+
 /* ---------- Local Cache & Storage Fallbacks ---------- */
 
 // Get the list of registered users.
@@ -154,7 +209,24 @@ function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-/* ---------- Current user (the "session") ---------- */
+/* ---------- Current user (the "session") & Token ---------- */
+
+// Get stored JWT authentication token
+function getAuthToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+// Save JWT authentication token
+function saveAuthToken(token) {
+  if (token) {
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+  }
+}
+
+// Remove JWT authentication token
+function clearAuthToken() {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+}
 
 // Get the user who is currently logged in, or null if nobody is logged in.
 function getCurrentUser() {
@@ -162,14 +234,15 @@ function getCurrentUser() {
   return stored ? JSON.parse(stored) : null;
 }
 
-// Save the logged-in user — this is what "logging in" means in Phase 1.
+// Save the logged-in user in session storage.
 function saveCurrentUser(user) {
   localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
 }
 
-// Remove the logged-in user — this is what "logging out" means.
+// Remove the logged-in user and token on logout.
 function clearCurrentUser() {
   localStorage.removeItem(CURRENT_USER_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
 // Get all posted items (both lost and found in one list).
@@ -229,20 +302,23 @@ function ensureAdminAccount() {
   const users = getUsers();
   let changed = false;
 
-  // Every user needs a role and an active flag.
+  // Every user needs a role and an active flag, and no plain-text passwords should be stored
   users.forEach(function (u) {
     if (!u.role) { u.role = 'user'; changed = true; }
     if (u.active === undefined) { u.active = true; changed = true; }
+    if (u.password !== undefined) {
+      delete u.password;
+      changed = true;
+    }
   });
 
-  // If there is no admin yet, create the demo admin account.
+  // If there is no admin in the local users catalog, initialize the admin profile (without credentials)
   const adminExists = users.some(u => u.role === 'admin');
   if (!adminExists) {
     users.push({
       id: Date.now(),
       name: 'Campus Admin',
       email: 'admin@campus.edu',
-      password: 'admin123',
       role: 'admin',
       active: true,
       createdAt: Date.now()
