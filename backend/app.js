@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const apiRoutes = require('./routes');
@@ -9,6 +11,7 @@ const app = express();
 // Security and Parsing Middlewares
 const allowedOrigins = [
   'https://campuslost-and-found.netlify.app',
+  'https://campus-lost-and-found-r1d3.onrender.com',
   process.env.CLIENT_ORIGIN
 ].filter(Boolean);
 
@@ -33,21 +36,31 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Root welcome endpoint
+// Safely resolve frontend directory path relative to backend source location
+const frontendPath = [
+  path.resolve(__dirname, '../frontend'),
+  path.resolve(__dirname, './frontend'),
+  path.resolve(process.cwd(), 'frontend'),
+  path.resolve(process.cwd(), '../frontend')
+].find((dir) => fs.existsSync(dir)) || path.resolve(__dirname, '../frontend');
+
+// 1. Mount API routes under /api (BEFORE static files so /api/* is never intercepted)
+app.use('/api', apiRoutes);
+
+// 2. Serve static frontend assets (CSS, JS, images, HTML)
+app.use(express.static(frontendPath, {
+  extensions: ['html']
+}));
+
+// Root endpoint: Serve frontend/index.html directly (Campus Lost & Found Login page)
 app.get('/', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Welcome to Campus Lost & Found Backend API',
-    endpoints: {
-      health: '/api/health',
-      items: '/api/items',
-      auth: '/api/auth'
-    }
-  });
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Mount API routes under /api
-app.use('/api', apiRoutes);
+// Login alias: Serve frontend/index.html
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 // Catch-all 404 Handler for undefined routes
 app.use(notFoundHandler);
