@@ -94,11 +94,13 @@ By default, the server starts on port `5000` (or `process.env.PORT`). If `MONGOD
 
 ## API Endpoints (Issue #1 & #3)
 
-### 1. System Endpoints
+### 1. System & Frontend Endpoints
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/` | API welcome banner and endpoint directory |
+| GET | `/` | Serves Campus Lost & Found web application (Login page `frontend/index.html`) |
+| GET | `/api` | API welcome banner and endpoint directory (JSON) |
 | GET | `/api/health` | Service health, uptime, and environment check |
+
 
 ### 2. Item CRUD Endpoints (`/api/items`)
 | Method | Endpoint | Purpose | Query / Params | Success Status |
