@@ -200,11 +200,25 @@ A complete, importable Postman collection is available at:
 
 ## Automated Tests
 
-Run the backend test suite using Node's built-in test runner:
+Run the backend test suite using Node.js's built-in test runner:
+
 ```bash
 npm test
 ```
-The suite runs 29 tests covering:
-- Health and 404 routing
-- Offline Item schema validation rules
-- Safe in-memory isolated CRUD API endpoint tests (mocked DB, safe from altering real data)
+
+The suite contains **53 tests** covering:
+
+- Health checks and 404 route handling.
+- Item and User schema validation.
+- Isolated Item CRUD API endpoint tests using mocked database operations.
+- User registration and login validation.
+- Duplicate email rejection and invalid credentials handling.
+- Password hashing and prevention of password exposure.
+- JWT generation, verification, expiration, and malformed token rejection.
+- Protected user profile endpoint (`GET /api/auth/me`).
+- Prevention of client-supplied admin role escalation.
+- Production JWT secret configuration validation.
+
+The tests use isolated mocks and offline schema validation where applicable, avoiding modifications to the live MongoDB database.
+
+Run the test suite before documenting the current passing test count.
